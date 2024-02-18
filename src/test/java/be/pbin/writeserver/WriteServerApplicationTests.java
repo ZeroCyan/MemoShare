@@ -11,8 +11,9 @@ import org.springframework.http.ResponseEntity;
 import java.net.URI;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 class WriteServerApplicationTests {
 
 	@Autowired
@@ -30,5 +31,24 @@ class WriteServerApplicationTests {
 
         ResponseEntity<String> getResponse = restTemplate.getForEntity(returnedUri, String.class);
         assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(getResponse.getHeaders()).containsKey("forId");
+    }
+
+    @Test
+    void shouldGenerateUniqueUrlForNewPaste() {
+        PasteData newPasteData = new PasteData(10, "contents");
+
+        ResponseEntity<String> response = restTemplate.postForEntity("/api/paste", newPasteData, String.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+
+        URI returnedUri = response.getHeaders().getLocation();
+        assertThat(returnedUri).isNotNull();
+
+        String path = returnedUri.getPath();
+        String[] segments = path.split("/");
+        String lastSegment = segments[segments.length - 1];
+
+        assertThat(lastSegment.length()).isEqualTo(8);
+        assertTrue(lastSegment.matches("^\\w{8}$"));
     }
 }
