@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Getter @Setter
-public class ObjectStoreModel {
+public class BlobModel {
 
     private String id;
     private String payload;

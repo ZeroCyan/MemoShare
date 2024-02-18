@@ -1,8 +1,8 @@
 package be.pbin.writeserver.service;
 
 import be.pbin.writeserver.api.PasteData;
-import be.pbin.writeserver.data.objectstore.ObjectStoreModel;
-import be.pbin.writeserver.data.objectstore.ObjectStoreRepository;
+import be.pbin.writeserver.data.objectstore.BlobModel;
+import be.pbin.writeserver.data.objectstore.BlobRepository;
 import be.pbin.writeserver.data.sql.PasteModel;
 import be.pbin.writeserver.data.sql.SQLRepository;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -15,11 +15,11 @@ import java.time.LocalDateTime;
 public class PasteServiceImplementation implements PasteService {
 
     private final SQLRepository sqlRepository;
-    private final ObjectStoreRepository objectStoreRepository;
+    private final BlobRepository blobRepository;
 
-    public PasteServiceImplementation(SQLRepository sqlRepository, ObjectStoreRepository objectStoreRepository) {
+    public PasteServiceImplementation(SQLRepository sqlRepository, BlobRepository blobRepository) {
         this.sqlRepository = sqlRepository;
-        this.objectStoreRepository = objectStoreRepository;
+        this.blobRepository = blobRepository;
     }
 
     @Override
@@ -30,17 +30,17 @@ public class PasteServiceImplementation implements PasteService {
             randomIdentifier = RandomStringUtils.random(8, true, true);
         }
 
-        ObjectStoreModel objectStore = new ObjectStoreModel();
-        objectStore.setId(randomIdentifier);
-        objectStore.setPayload(pasteData.getPasteContents());
+        BlobModel blob = new BlobModel();
+        blob.setId(randomIdentifier);
+        blob.setPayload(pasteData.getPasteContents());
 
-        URI pathToObject = objectStoreRepository.saveObject(objectStore);
+        String pathToObject = blobRepository.saveObject(blob);
 
         PasteModel newPaste = new PasteModel();
         newPaste.setShortLink(randomIdentifier);
         newPaste.setCreationDate(LocalDateTime.now());
         newPaste.setExpirationTime(pasteData.getExpirationTimeInMinutes());
-        newPaste.setPath(pathToObject.toString());
+        newPaste.setPath(pathToObject);
         sqlRepository.save(newPaste);
 
         return URI.create("/api/get/" + randomIdentifier);

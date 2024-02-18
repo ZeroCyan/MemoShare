@@ -25,7 +25,7 @@ public class ApiController {
     @PostMapping(value = "/paste",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    private ResponseEntity<String> pasteData(@RequestBody PasteData pasteData) {
+    private ResponseEntity<String> pasteData(@RequestBody PasteData pasteData) { //todo: validate request body
         URI uri = pasteService.save(pasteData);
         return ResponseEntity.created(uri).build();
     }

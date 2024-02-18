@@ -8,7 +8,7 @@ import java.util.Objects;
 @Getter
 public class PasteData {
 
-    @JsonProperty("expiration_time_in_minutes")
+    @JsonProperty("expiration_time_in_minutes") //todo: add JSON validation
     private final int expirationTimeInMinutes;
     @JsonProperty("paste_contents")
     private final String pasteContents;
