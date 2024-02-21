@@ -9,5 +9,4 @@ public class WriteserverApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(WriteserverApplication.class, args);
 	}
-
 }

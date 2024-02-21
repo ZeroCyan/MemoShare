@@ -32,17 +32,16 @@ public class PasteServiceImplementation implements PasteService {
 
         BlobModel blob = new BlobModel();
         blob.setId(randomIdentifier);
-        blob.setPayload(pasteData.getPasteContents());
+        blob.setPayload(pasteData.getPasteContent());
 
         String pathToObject = blobRepository.saveObject(blob);
 
-        PasteModel newPaste = new PasteModel();
-        newPaste.setShortLink(randomIdentifier);
-        newPaste.setCreationDate(LocalDateTime.now());
-        newPaste.setExpirationTime(pasteData.getExpirationTimeInMinutes());
-        newPaste.setPath(pathToObject);
+        PasteModel newPaste = PasteModel.builder()
+                .shortLink(randomIdentifier)
+                .path(pathToObject)
+                .creationDate(LocalDateTime.now())
+                .expirationTime(pasteData.getExpirationTimeInMinutes()).build();
         sqlRepository.save(newPaste);
-
         return URI.create("/api/get/" + randomIdentifier);
     }
 }

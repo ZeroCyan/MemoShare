@@ -1,6 +1,7 @@
 package be.pbin.writeserver.api;
 
 import be.pbin.writeserver.service.PasteService;
+import jakarta.validation.Valid;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,7 +26,7 @@ public class ApiController {
     @PostMapping(value = "/paste",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    private ResponseEntity<String> pasteData(@RequestBody PasteData pasteData) { //todo: validate request body
+    private ResponseEntity<String> pasteData(@Valid @RequestBody PasteData pasteData)  {
         URI uri = pasteService.save(pasteData);
         return ResponseEntity.created(uri).build();
     }

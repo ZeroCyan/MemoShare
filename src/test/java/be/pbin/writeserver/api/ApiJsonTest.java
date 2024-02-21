@@ -42,6 +42,6 @@ public class ApiJsonTest {
                 """;
         assertThat(json.parse(expected)).isEqualTo(new PasteData(60, "dummy paste content"));
         assertThat(json.parseObject(expected).getExpirationTimeInMinutes()).isEqualTo(60);
-        assertThat(json.parseObject(expected).getPasteContents()).isEqualTo("dummy paste content");
+        assertThat(json.parseObject(expected).getPasteContent()).isEqualTo("dummy paste content");
     }
 }
