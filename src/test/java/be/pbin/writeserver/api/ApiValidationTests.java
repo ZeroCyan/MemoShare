@@ -2,6 +2,7 @@ package be.pbin.writeserver.api;
 
 import be.pbin.writeserver.data.sql.PasteModel;
 import be.pbin.writeserver.data.sql.SQLRepository;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,7 +20,6 @@ public class ApiValidationTests {
 
     private static final String POST_ENDPOINT = "/api/paste";
     private static final String PARSE_ERROR_MESSAGE = "Errors in request body detected: Refer to the API contract for the correct request body format.";
-//    private static final String PARSE_ERROR_MESSAGE = "Unknown elements in request body detected: Refer to the API contract for the correct request body format.";
 
     @Autowired
     private TestRestTemplate restTemplate;
@@ -130,7 +130,7 @@ public class ApiValidationTests {
 
         ResponseEntity<String> response = restTemplate.exchange(POST_ENDPOINT, HttpMethod.POST, entity, String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(response.getBody()).isEqualTo("Input validation error: 'paste_contents' must be present in the request. Hint: check spelling");
+        assertThat(response.getBody()).contains("Input validation error: 'paste_contents' must be present in the request. Hint: check spelling");
     }
 
     @Test
@@ -184,6 +184,23 @@ public class ApiValidationTests {
         ResponseEntity<String> response = restTemplate.exchange(POST_ENDPOINT, HttpMethod.POST, entity, String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(response.getBody()).isEqualTo("Input validation error: Expiration time cannot be negative");
+    }
+
+    @Test
+    void test_expirationTimeValue_tooLarge_shouldReturn400() {
+        String requestBody = """
+                {
+                  "expiration_time_in_minutes": 2147483646,
+                  "paste_contents": "dummy paste content"
+                }
+                """;
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(POST_ENDPOINT, HttpMethod.POST, entity, String.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).isEqualTo("Input validation error: Expiration time exceeds limit. Hint: Set expiration to 0 to prevent expiration.");
     }
 
     @Test
@@ -340,5 +357,44 @@ public class ApiValidationTests {
         response = restTemplate.exchange(POST_ENDPOINT, HttpMethod.POST, entity, String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(response.getBody()).isEqualTo(PARSE_ERROR_MESSAGE);
+    }
+
+    @Test
+    void test_pasteContentValue_empty_shouldReturn400() {
+        String requestBody = """
+                {
+                  "expiration_time_in_minutes": 3,
+                  "paste_contents": ""
+                }
+                """;
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(POST_ENDPOINT, HttpMethod.POST, entity, String.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).isEqualTo("Input validation error: 'paste_contents' is empty");
+    }
+
+//    @Test //todo: results in a JSON parse error: Illegal unquoted character ((CTRL-CHAR, code 18)): has to be escaped using backslash to be included in string value
+            //todo: later on check if the parsing of certain characters gives errors with JSON
+    @Test
+    void test_pasteContentValue_tooLarge_shouldReturn400() {
+        String tooLargeString = RandomStringUtils.randomAlphanumeric(1_000_001);
+
+        String requestBody = """
+                {
+                  "expiration_time_in_minutes": 3,
+                  "paste_contents": \"%s\"
+                }
+                """.formatted(tooLargeString);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(POST_ENDPOINT, HttpMethod.POST, entity, String.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).isEqualTo("Input validation error: Character limit exceeded. The maximum allowed is 1 million characters.");
     }
 }

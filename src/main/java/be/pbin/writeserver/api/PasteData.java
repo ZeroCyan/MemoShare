@@ -1,8 +1,7 @@
 package be.pbin.writeserver.api;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.*;
 import lombok.Getter;
 
 import java.util.Objects;
@@ -12,9 +11,13 @@ public class PasteData {
 
     @JsonProperty("expiration_time_in_minutes") //todo: add JSON validation
     @Min(value = 0L, message = "Expiration time cannot be negative")
+    @Max(value = 26_000_000, message = "Expiration time exceeds limit. Hint: Set expiration to 0 to prevent expiration.")
     private int expirationTimeInMinutes;
+
     @JsonProperty(value = "paste_contents")
     @NotNull(message = "'paste_contents' must be present in the request. Hint: check spelling")
+    @NotEmpty(message = "'paste_contents' is empty")
+    @Size(max = 1_000_000, message = "Character limit exceeded. The maximum allowed is 1 million characters.")
     private final String pasteContent;
 
     public PasteData(int expirationTimeInMinutes, String pasteContent) {
