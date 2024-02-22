@@ -13,7 +13,7 @@ import java.io.InputStream;
 public class AzuriteRepository implements BlobRepository {
 
     private static final String BLOB_SERVICE_URL = "http://localhost:4242/";
-    private static final String BLOB_CONTAINER_NAME = "pastes";
+    private static final String BLOB_CONTAINER_NAME = "notes";
     private static final String AZURITE_DEFAULT_ACCOUNT = "devstoreaccount1";
     private static final String AZURITE_DEFAULT_KEY = "Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==";
     private static final String AZURITE_CONNECTION_STRING = "DefaultEndpointsProtocol=https;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=" + BLOB_SERVICE_URL + AZURITE_DEFAULT_ACCOUNT;

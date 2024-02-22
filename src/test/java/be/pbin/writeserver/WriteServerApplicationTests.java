@@ -1,6 +1,6 @@
 package be.pbin.writeserver;
 
-import be.pbin.writeserver.api.PasteData;
+import be.pbin.writeserver.api.NoteData;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,10 +20,10 @@ class WriteServerApplicationTests {
     private TestRestTemplate restTemplate;
 
     @Test
-    void shouldCreateNewPasteObject() {
-        PasteData newPasteData = new PasteData(10, "contents");
+    void shouldCreateNewnoteObject() {
+        NoteData newNoteData = new NoteData(10, "contents");
 
-        ResponseEntity<String> response = restTemplate.postForEntity("/api/paste", newPasteData, String.class);
+        ResponseEntity<String> response = restTemplate.postForEntity("/api/note", newNoteData, String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
         URI returnedUri = response.getHeaders().getLocation();
@@ -35,10 +35,10 @@ class WriteServerApplicationTests {
     }
 
     @Test
-    void shouldGenerateUniqueUrlForNewPaste() {
-        PasteData newPasteData = new PasteData(10, "contents");
+    void shouldGenerateUniqueUrlForNewnote() {
+        NoteData newNoteData = new NoteData(10, "contents");
 
-        ResponseEntity<String> response = restTemplate.postForEntity("/api/paste", newPasteData, String.class);
+        ResponseEntity<String> response = restTemplate.postForEntity("/api/note", newNoteData, String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
         URI returnedUri = response.getHeaders().getLocation();

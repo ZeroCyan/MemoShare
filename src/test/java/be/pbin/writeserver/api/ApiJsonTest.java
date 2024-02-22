@@ -13,35 +13,35 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ApiJsonTest {
 
     @Autowired
-    private JacksonTester<PasteData> json;
+    private JacksonTester<NoteData> json;
 
     @Test
-    void pasteDataSerializationTest() throws IOException {
-        PasteData pasteData = new PasteData(60, "dummy paste content");
+    void noteDataSerializationTest() throws IOException {
+        NoteData noteData = new NoteData(60, "dummy note content");
 
-        assertThat(json.write(pasteData)).isStrictlyEqualToJson("expected.json");
+        assertThat(json.write(noteData)).isStrictlyEqualToJson("expected.json");
 
-        assertThat(json.write(pasteData)).hasJsonPathNumberValue("@.expiration_time_in_minutes");
-        assertThat(json.write(pasteData))
+        assertThat(json.write(noteData)).hasJsonPathNumberValue("@.expiration_time_in_minutes");
+        assertThat(json.write(noteData))
                 .extractingJsonPathNumberValue("@.expiration_time_in_minutes")
                 .isEqualTo(60);
 
-        assertThat(json.write(pasteData)).hasJsonPathStringValue("@.paste_contents");
-        assertThat(json.write(pasteData))
-                .extractingJsonPathStringValue("@.paste_contents")
-                .isEqualTo("dummy paste content");
+        assertThat(json.write(noteData)).hasJsonPathStringValue("@.note_contents");
+        assertThat(json.write(noteData))
+                .extractingJsonPathStringValue("@.note_contents")
+                .isEqualTo("dummy note content");
     }
 
     @Test
-    void pasteDataDeserializationTest() throws IOException {
+    void noteDataDeserializationTest() throws IOException {
         String expected = """
                 {
                   "expiration_time_in_minutes": 60,
-                  "paste_contents": "dummy paste content"
+                  "note_contents": "dummy note content"
                 }
                 """;
-        assertThat(json.parse(expected)).isEqualTo(new PasteData(60, "dummy paste content"));
+        assertThat(json.parse(expected)).isEqualTo(new NoteData(60, "dummy note content"));
         assertThat(json.parseObject(expected).getExpirationTimeInMinutes()).isEqualTo(60);
-        assertThat(json.parseObject(expected).getPasteContent()).isEqualTo("dummy paste content");
+        assertThat(json.parseObject(expected).getNoteContent()).isEqualTo("dummy note content");
     }
 }

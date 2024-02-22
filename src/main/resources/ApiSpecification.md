@@ -1,10 +1,10 @@
 Request:
-    URI: /api/paste
+    URI: /api/note
     HTTP Verb: POST
     Example Body:
         {
             "expiration_time_in_minutes": 60,
-            "paste_contents": "Hello World!"
+            "note_contents": "Hello World!"
         }
     Notes:
         - Setting "expiration_time_in_minutes" to 0 means there is no expiration time.

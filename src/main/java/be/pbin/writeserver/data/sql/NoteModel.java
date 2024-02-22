@@ -8,18 +8,18 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Entity @Table(name = "pastes")
+@Entity @Table(name = "notes")
 @Getter @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PasteModel {
+public class NoteModel {
 
     @Id
     @Column(name = "short_link")
     private String shortLink;
 
-    @Column(name = "path_to_paste")
+    @Column(name = "path_to_note")
     private String path;
 
     @Column(name = "created_at")

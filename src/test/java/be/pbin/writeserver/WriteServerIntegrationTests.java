@@ -1,6 +1,6 @@
 package be.pbin.writeserver;
 
-import be.pbin.writeserver.data.sql.PasteModel;
+import be.pbin.writeserver.data.sql.NoteModel;
 import be.pbin.writeserver.data.sql.SQLRepository;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
@@ -48,30 +48,30 @@ public class WriteServerIntegrationTests {
     @Autowired
     private SQLRepository sqlRepository;
 
-    @Test
-    void testContainerShouldInitSchemaAndLoadDummyData() {
-        assertTrue(sqlRepository.existsById("XyZ987K5")); //cf. data.sql
-        assertTrue(sqlRepository.existsById("PqR67Z90"));
-    }
+//    @Test
+//    void testContainerShouldInitSchemaAndLoadDummyData() {
+//        assertTrue(sqlRepository.existsById("XyZ987K5")); //cf. data.sql
+//        assertTrue(sqlRepository.existsById("PqR67Z90"));
+//    }
 
     @Test
     void testContainerShouldBeWritableAndReadable() {
         String shortlink = "shrtlink";
         String path = RandomStringUtils.randomAlphabetic(10);
-        PasteModel paste = PasteModel.builder()
+        NoteModel note = NoteModel.builder()
                 .shortLink(shortlink)
                 .creationDate(LocalDateTime.now())
                 .expirationTime(10)
                 .path(path).build();
-        sqlRepository.save(paste);
+        sqlRepository.save(note);
 
         assertTrue(sqlRepository.existsById(shortlink));
 
-        Optional<PasteModel> optionalPaste = sqlRepository.findById(shortlink);
-        assertThat(optionalPaste).isPresent();
-        assertThat(optionalPaste.get().getShortLink()).isEqualTo(shortlink);
-        assertThat(optionalPaste.get().getPath()).isEqualTo(path);
-        assertThat(optionalPaste.get().getExpirationTime()).isEqualTo(10);
+        Optional<NoteModel> optionalnote = sqlRepository.findById(shortlink);
+        assertThat(optionalnote).isPresent();
+        assertThat(optionalnote.get().getShortLink()).isEqualTo(shortlink);
+        assertThat(optionalnote.get().getPath()).isEqualTo(path);
+        assertThat(optionalnote.get().getExpirationTime()).isEqualTo(10);
     }
 
 

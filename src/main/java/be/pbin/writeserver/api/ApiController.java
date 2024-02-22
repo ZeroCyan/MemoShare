@@ -1,6 +1,6 @@
 package be.pbin.writeserver.api;
 
-import be.pbin.writeserver.service.PasteService;
+import be.pbin.writeserver.service.NoteService;
 import jakarta.validation.Valid;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -12,10 +12,10 @@ import java.net.URI;
 @RequestMapping("/api")
 public class ApiController {
 
-    private final PasteService pasteService;
+    private final NoteService noteService;
 
-    public ApiController(PasteService pasteService) {
-        this.pasteService = pasteService;
+    public ApiController(NoteService noteService) {
+        this.noteService = noteService;
     }
 
     @GetMapping("/get/{identifier}") //todo: temporary get method, later will move to READ SERVER.
@@ -23,11 +23,11 @@ public class ApiController {
         return ResponseEntity.ok().header("forId", identifier).build();
     }
 
-    @PostMapping(value = "/paste",
+    @PostMapping(value = "/note",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    private ResponseEntity<String> pasteData(@Valid @RequestBody PasteData pasteData)  {
-        URI uri = pasteService.save(pasteData);
+    private ResponseEntity<String> noteData(@Valid @RequestBody NoteData noteData)  {
+        URI uri = noteService.save(noteData);
         return ResponseEntity.created(uri).build();
     }
 }

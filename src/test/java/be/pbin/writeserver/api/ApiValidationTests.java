@@ -1,6 +1,6 @@
 package be.pbin.writeserver.api;
 
-import be.pbin.writeserver.data.sql.PasteModel;
+import be.pbin.writeserver.data.sql.NoteModel;
 import be.pbin.writeserver.data.sql.SQLRepository;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
@@ -18,7 +18,7 @@ import static org.junit.Assert.assertTrue;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class ApiValidationTests {
 
-    private static final String POST_ENDPOINT = "/api/paste";
+    private static final String POST_ENDPOINT = "/api/note";
     private static final String PARSE_ERROR_MESSAGE = "Errors in request body detected: Refer to the API contract for the correct request body format.";
 
     @Autowired
@@ -29,8 +29,8 @@ public class ApiValidationTests {
 
     @Test //todo: dirty test, clean it up
     void whenTheExpirationTimeInMinutesIsNotPresentThereShouldBeNoExpiration() {
-        PasteData newPasteData = new PasteData("please don't let me expire");
-        ResponseEntity<String> response = restTemplate.postForEntity(POST_ENDPOINT, newPasteData, String.class);
+        NoteData newNoteData = new NoteData("please don't let me expire");
+        ResponseEntity<String> response = restTemplate.postForEntity(POST_ENDPOINT, newNoteData, String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
         URI returnedUri = response.getHeaders().getLocation();
@@ -40,9 +40,9 @@ public class ApiValidationTests {
         String lastSegment = segments[segments.length - 1];
 
         assertTrue(sqlRepository.existsById(lastSegment));
-        Optional<PasteModel> pasteModelOptional = sqlRepository.findById(lastSegment);
+        Optional<NoteModel> noteModelOptional = sqlRepository.findById(lastSegment);
 
-        assertThat(pasteModelOptional.get().getExpirationTime()).isEqualTo(0);
+        assertThat(noteModelOptional.get().getExpirationTime()).isEqualTo(0);
     }
 
     @Test
@@ -50,7 +50,7 @@ public class ApiValidationTests {
         String requestBody = """
                 {
                   "expiration_time_in_minutes": 3,
-                  "paste_contents": "dummy paste content"
+                  "note_contents": "dummy note content"
                 }
                 """;
         HttpHeaders headers = new HttpHeaders();
@@ -66,7 +66,7 @@ public class ApiValidationTests {
         String requestBody = """
                 {
                   "expiration_time_in_minutes": 3,
-                  "paste_contents": "dummy paste content"
+                  "note_contents": "dummy note content"
                 }
                 """;
         HttpHeaders headers = new HttpHeaders();
@@ -91,7 +91,7 @@ public class ApiValidationTests {
         String requestBody = """
                 {
                   "expiration_time_in_minutes": 3,
-                  "paste_contents": "dummy paste content",
+                  "note_contents": "dummy note content",
                 }
                 """;
         HttpHeaders headers = new HttpHeaders();
@@ -107,7 +107,7 @@ public class ApiValidationTests {
     void test_requestBody_orderOfArrayElementsChanged_shouldPass() {
         String requestBody = """
                 {
-                  "paste_contents": "dummy paste content",
+                  "note_contents": "dummy note content",
                   "expiration_time_in_minutes": 3
                 }
                 """;
@@ -130,7 +130,7 @@ public class ApiValidationTests {
 
         ResponseEntity<String> response = restTemplate.exchange(POST_ENDPOINT, HttpMethod.POST, entity, String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(response.getBody()).contains("Input validation error: 'paste_contents' must be present in the request. Hint: check spelling");
+        assertThat(response.getBody()).contains("Input validation error: 'note_contents' must be present in the request. Hint: check spelling");
     }
 
     @Test
@@ -138,7 +138,7 @@ public class ApiValidationTests {
         String requestBody = """
                 {
                   "expiration_time_in_minutes": 3,
-                  "paste_contents": "dummy paste content",
+                  "note_contents": "dummy note content",
                   "foo": "bar",
                   "faa": 303
                 }
@@ -157,7 +157,7 @@ public class ApiValidationTests {
         String requestBody = """
                 {
                   "expiration_time_in_minutes": "asdf",
-                  "paste_contents": "dummy paste content"
+                  "note_contents": "dummy note content"
                 }
                 """;
         HttpHeaders headers = new HttpHeaders();
@@ -174,7 +174,7 @@ public class ApiValidationTests {
         String requestBody = """
                 {
                   "expiration_time_in_minutes": -3,
-                  "paste_contents": "dummy paste content"
+                  "note_contents": "dummy note content"
                 }
                 """;
         HttpHeaders headers = new HttpHeaders();
@@ -191,7 +191,7 @@ public class ApiValidationTests {
         String requestBody = """
                 {
                   "expiration_time_in_minutes": 2147483646,
-                  "paste_contents": "dummy paste content"
+                  "note_contents": "dummy note content"
                 }
                 """;
         HttpHeaders headers = new HttpHeaders();
@@ -208,7 +208,7 @@ public class ApiValidationTests {
         String requestBody = """
                 {
                   "exparition_time_in_minutes": 1,
-                  "paste_contents": "dummy paste content"
+                  "note_contents": "dummy note content"
                 }
                 """;
         HttpHeaders headers = new HttpHeaders();
@@ -225,7 +225,7 @@ public class ApiValidationTests {
         String requestBody = """
                 {
                   "e": 1,
-                  "paste_contents": "dummy paste content"
+                  "note_contents": "dummy note content"
                 }
                 """;
         HttpHeaders headers = new HttpHeaders();
@@ -241,7 +241,7 @@ public class ApiValidationTests {
         requestBody = """
                 {
                   "": 1,
-                  "paste_contents": "dummy paste content"
+                  "note_contents": "dummy note content"
                 }
                 """;
         entity = new HttpEntity<>(requestBody, headers);
@@ -254,7 +254,7 @@ public class ApiValidationTests {
         requestBody = """
                 {
                   "asdjfiow": 1,
-                  "paste_contents": "dummy paste content"
+                  "note_contents": "dummy note content"
                 }
                 """;
         entity = new HttpEntity<>(requestBody, headers);
@@ -265,11 +265,11 @@ public class ApiValidationTests {
     }
 
     @Test
-    void test_pasteContentsKey_incorrectSpelling_shouldReturn400() {
+    void test_noteContentsKey_incorrectSpelling_shouldReturn400() {
         String requestBody = """
                 {
                   "expiration_time_in_minutes": 1,
-                  "paste_contnts": "dummy paste content"
+                  "note_contnts": "dummy note content"
                 }
                 """;
         HttpHeaders headers = new HttpHeaders();
@@ -285,7 +285,7 @@ public class ApiValidationTests {
         requestBody = """
                 {
                   "expiration_time_in_minutes": 1,
-                  "post_contents": "dummy paste content"
+                  "post_contents": "dummy note content"
                 }
                 """;
         entity = new HttpEntity<>(requestBody, headers);
@@ -298,7 +298,7 @@ public class ApiValidationTests {
         requestBody = """
                 {
                   "expiration_time_in_minutes": 1,
-                  "pastecontents": "dummy paste content"
+                  "notecontents": "dummy note content"
                 }
                 """;
         entity = new HttpEntity<>(requestBody, headers);
@@ -311,7 +311,7 @@ public class ApiValidationTests {
         requestBody = """
                 {
                   "expiration_time_in_minutes": 1,
-                  "": "dummy paste content"
+                  "": "dummy note content"
                 }
                 """;
         entity = new HttpEntity<>(requestBody, headers);
@@ -321,11 +321,11 @@ public class ApiValidationTests {
     }
 
     @Test
-    void test_pasteContentsKey_absence_shouldReturn400() {
+    void test_noteContentsKey_absence_shouldReturn400() {
         String requestBody = """
                 {
                   "expiration_time_in_minutes": 1,
-                  "p": "dummy paste content"
+                  "p": "dummy note content"
                 }
                 """;
         HttpHeaders headers = new HttpHeaders();
@@ -339,7 +339,7 @@ public class ApiValidationTests {
         requestBody = """
                 {
                   "expiration_time_in_minutes": 1,
-                  "": "dummy paste content"
+                  "": "dummy note content"
                 }
                 """;
         entity = new HttpEntity<>(requestBody, headers);
@@ -350,7 +350,7 @@ public class ApiValidationTests {
         requestBody = """
                 {
                   "expiration_time_in_minutes": 1,
-                  "rueiroew59202": "dummy paste content"
+                  "rueiroew59202": "dummy note content"
                 }
                 """;
         entity = new HttpEntity<>(requestBody, headers);
@@ -360,11 +360,11 @@ public class ApiValidationTests {
     }
 
     @Test
-    void test_pasteContentValue_empty_shouldReturn400() {
+    void test_noteContentValue_empty_shouldReturn400() {
         String requestBody = """
                 {
                   "expiration_time_in_minutes": 3,
-                  "paste_contents": ""
+                  "note_contents": ""
                 }
                 """;
         HttpHeaders headers = new HttpHeaders();
@@ -373,19 +373,19 @@ public class ApiValidationTests {
 
         ResponseEntity<String> response = restTemplate.exchange(POST_ENDPOINT, HttpMethod.POST, entity, String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(response.getBody()).isEqualTo("Input validation error: 'paste_contents' is empty");
+        assertThat(response.getBody()).isEqualTo("Input validation error: 'note_contents' is empty");
     }
 
 //    @Test //todo: results in a JSON parse error: Illegal unquoted character ((CTRL-CHAR, code 18)): has to be escaped using backslash to be included in string value
             //todo: later on check if the parsing of certain characters gives errors with JSON
     @Test
-    void test_pasteContentValue_tooLarge_shouldReturn400() {
+    void test_noteContentValue_tooLarge_shouldReturn400() {
         String tooLargeString = RandomStringUtils.randomAlphanumeric(1_000_001);
 
         String requestBody = """
                 {
                   "expiration_time_in_minutes": 3,
-                  "paste_contents": \"%s\"
+                  "note_contents": \"%s\"
                 }
                 """.formatted(tooLargeString);
 
