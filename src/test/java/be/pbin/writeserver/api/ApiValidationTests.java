@@ -1,7 +1,8 @@
 package be.pbin.writeserver.api;
 
-import be.pbin.writeserver.data.sql.NoteModel;
-import be.pbin.writeserver.data.sql.SQLRepository;
+import be.pbin.writeserver.data.metadata.NoteMetaData;
+import be.pbin.writeserver.data.metadata.NoteMetadataRepository;
+import be.pbin.writeserver.utils.UriUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +14,6 @@ import java.net.URI;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertTrue;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class ApiValidationTests {
@@ -25,7 +25,7 @@ public class ApiValidationTests {
     private TestRestTemplate restTemplate;
 
     @Autowired
-    private SQLRepository sqlRepository;
+    private NoteMetadataRepository sqlRepository;
 
     @Test //todo: dirty test, clean it up
     void whenTheExpirationTimeInMinutesIsNotPresentThereShouldBeNoExpiration() {
@@ -34,13 +34,13 @@ public class ApiValidationTests {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
         URI returnedUri = response.getHeaders().getLocation();
+        assertThat(response.getHeaders().getLocation()).isNotNull();
+        assertThat(response.getHeaders()).isNotNull();
 
-        String path = returnedUri.getPath();
-        String[] segments = path.split("/");
-        String lastSegment = segments[segments.length - 1];
+        String lastSegment = UriUtils.extractLastSegment(returnedUri);
 
-        assertTrue(sqlRepository.existsById(lastSegment));
-        Optional<NoteModel> noteModelOptional = sqlRepository.findById(lastSegment);
+        assertThat(sqlRepository.existsById(lastSegment)).isTrue();
+        Optional<NoteMetaData> noteModelOptional = sqlRepository.findById(lastSegment);
 
         assertThat(noteModelOptional.get().getExpirationTime()).isEqualTo(0);
     }

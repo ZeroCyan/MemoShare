@@ -1,10 +1,10 @@
 package be.pbin.writeserver.service;
 
 import be.pbin.writeserver.api.NoteData;
-import be.pbin.writeserver.data.objectstore.BlobModel;
-import be.pbin.writeserver.data.objectstore.BlobRepository;
-import be.pbin.writeserver.data.sql.NoteModel;
-import be.pbin.writeserver.data.sql.SQLRepository;
+import be.pbin.writeserver.data.payload.NotePayload;
+import be.pbin.writeserver.data.payload.PayloadRepository;
+import be.pbin.writeserver.data.metadata.NoteMetaData;
+import be.pbin.writeserver.data.metadata.NoteMetadataRepository;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Service;
 
@@ -12,38 +12,39 @@ import java.net.URI;
 import java.time.LocalDateTime;
 @Service
 public class NoteServiceImplementation implements NoteService {
-    private final SQLRepository sqlRepository;
-    private final BlobRepository blobRepository;
+    private final NoteMetadataRepository metadataRepository;
+    private final PayloadRepository payloadRepository;
 
-    public NoteServiceImplementation(SQLRepository sqlRepository, BlobRepository blobRepository) {
-        this.sqlRepository = sqlRepository;
-        this.blobRepository = blobRepository;
+    public NoteServiceImplementation(NoteMetadataRepository metadataRepository, PayloadRepository payloadRepository) {
+        this.metadataRepository = metadataRepository;
+        this.payloadRepository = payloadRepository;
     }
 
     @Override
     public URI save(NoteData noteData) {
-        String noteId = getNoteId();
+        String uniqueNoteId = generateNoteId();
 
-        BlobModel blob = new BlobModel();
-        blob.setId(noteId);
-        blob.setPayload(noteData.getNoteContent());
+        NotePayload payload = NotePayload.builder()
+                .id(uniqueNoteId)
+                .payload(noteData.getNoteContent())
+                .build();
 
-        String pathToObject = blobRepository.saveObject(blob);
+        String pathToObject = payloadRepository.savePayload(payload);
 
-        NoteModel newNote = NoteModel.builder()
-                .shortLink(noteId)
+        NoteMetaData metadata = NoteMetaData.builder()
+                .shortLink(uniqueNoteId)
                 .path(pathToObject)
                 .creationDate(LocalDateTime.now())
                 .expirationTime(noteData.getExpirationTimeInMinutes()).build();
 
-        sqlRepository.save(newNote);
-        return URI.create("/api/get/" + noteId);
+        metadataRepository.save(metadata);
+        return URI.create("/api/get/" + uniqueNoteId);
     }
 
-    private String getNoteId() {
+    private String generateNoteId() {
         String randomIdentifier = RandomStringUtils.random(8, true, true);
 
-        while (sqlRepository.existsById(randomIdentifier)) {
+        while (metadataRepository.existsById(randomIdentifier)) {
             randomIdentifier = RandomStringUtils.random(8, true, true);
         }
         return randomIdentifier;

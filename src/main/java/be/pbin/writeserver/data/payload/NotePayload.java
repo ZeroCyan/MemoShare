@@ -1,10 +1,12 @@
-package be.pbin.writeserver.data.objectstore;
+package be.pbin.writeserver.data.payload;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter @Setter
-public class BlobModel {
+@Builder
+public class NotePayload {
 
     private String id;
     private String payload;

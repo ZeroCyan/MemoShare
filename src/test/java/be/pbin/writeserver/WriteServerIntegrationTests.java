@@ -1,7 +1,7 @@
 package be.pbin.writeserver;
 
-import be.pbin.writeserver.data.sql.NoteModel;
-import be.pbin.writeserver.data.sql.SQLRepository;
+import be.pbin.writeserver.data.metadata.NoteMetaData;
+import be.pbin.writeserver.data.metadata.NoteMetadataRepository;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +46,7 @@ public class WriteServerIntegrationTests {
     private TestRestTemplate restTemplate;
 
     @Autowired
-    private SQLRepository sqlRepository;
+    private NoteMetadataRepository sqlRepository;
 
 //    @Test
 //    void testContainerShouldInitSchemaAndLoadDummyData() {
@@ -58,7 +58,7 @@ public class WriteServerIntegrationTests {
     void testContainerShouldBeWritableAndReadable() {
         String shortlink = "shrtlink";
         String path = RandomStringUtils.randomAlphabetic(10);
-        NoteModel note = NoteModel.builder()
+        NoteMetaData note = NoteMetaData.builder()
                 .shortLink(shortlink)
                 .creationDate(LocalDateTime.now())
                 .expirationTime(10)
@@ -67,7 +67,7 @@ public class WriteServerIntegrationTests {
 
         assertTrue(sqlRepository.existsById(shortlink));
 
-        Optional<NoteModel> optionalnote = sqlRepository.findById(shortlink);
+        Optional<NoteMetaData> optionalnote = sqlRepository.findById(shortlink);
         assertThat(optionalnote).isPresent();
         assertThat(optionalnote.get().getShortLink()).isEqualTo(shortlink);
         assertThat(optionalnote.get().getPath()).isEqualTo(path);

@@ -1,4 +1,4 @@
-package be.pbin.writeserver.data.sql;
+package be.pbin.writeserver.data.metadata;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class NoteModel {
+public class NoteMetaData {
 
     @Id
     @Column(name = "short_link")
