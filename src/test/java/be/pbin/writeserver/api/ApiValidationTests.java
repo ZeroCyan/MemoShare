@@ -1,7 +1,7 @@
 package be.pbin.writeserver.api;
 
 import be.pbin.writeserver.data.metadata.NoteMetaData;
-import be.pbin.writeserver.data.metadata.NoteMetadataRepository;
+import be.pbin.writeserver.data.metadata.MetadataRepository;
 import be.pbin.writeserver.utils.UriUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
@@ -11,6 +11,7 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.*;
 
 import java.net.URI;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,7 +27,7 @@ public class ApiValidationTests {
     private TestRestTemplate restTemplate;
 
     @Autowired
-    private NoteMetadataRepository sqlRepository;
+    private MetadataRepository sqlRepository;
 
     @Test //todo: dirty test, clean it up
     void whenTheExpirationTimeInMinutesIsNotPresentThereShouldBeNoExpiration() {
@@ -43,7 +44,7 @@ public class ApiValidationTests {
         assertThat(sqlRepository.existsById(lastSegment)).isTrue();
         Optional<NoteMetaData> noteModelOptional = sqlRepository.findById(lastSegment);
 
-        assertThat(noteModelOptional.get().getExpirationTime()).isEqualTo(0);
+        assertThat(noteModelOptional.get().getExpirationDate()).isEqualTo(LocalDateTime.of(9999, 12, 31, 0,0,0));
     }
 
     @Test
@@ -408,6 +409,8 @@ public class ApiValidationTests {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(response.getBody()).isEqualTo("Content-Type 'application/json;charset=UTF-16' is not supported");
     }
+
+    //todo: add test that asserts that fractional minutes are disallowed
 
     private HttpEntity<String> createHttpEntity(String requestBody) {
         HttpHeaders headers = new HttpHeaders();

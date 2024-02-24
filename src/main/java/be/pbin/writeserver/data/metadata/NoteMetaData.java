@@ -25,6 +25,6 @@ public class NoteMetaData {
     @Column(name = "created_at")
     private LocalDateTime creationDate;
 
-    @Column(name = "expiration_length_in_minutes")
-    private int expirationTime;
+    @Column(name = "expires_at")
+    private LocalDateTime expirationDate;
 }
