@@ -11,6 +11,7 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.*;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -53,9 +54,7 @@ public class ApiValidationTests {
                   "note_contents": "dummy note content"
                 }
                 """;
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
+        HttpEntity<String> entity = createHttpEntity(requestBody);
 
         ResponseEntity<String> response = restTemplate.exchange(POST_ENDPOINT, HttpMethod.POST, entity, String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
@@ -69,6 +68,7 @@ public class ApiValidationTests {
                   "note_contents": "dummy note content"
                 }
                 """;
+
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_XML);
         HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
@@ -80,6 +80,7 @@ public class ApiValidationTests {
         ///
 
         headers.setContentType(MediaType.IMAGE_JPEG);
+        entity = new HttpEntity<>(requestBody, headers);
 
         response = restTemplate.exchange(POST_ENDPOINT, HttpMethod.POST, entity, String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -94,9 +95,7 @@ public class ApiValidationTests {
                   "note_contents": "dummy note content",
                 }
                 """;
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
+        HttpEntity<String> entity = createHttpEntity(requestBody);
 
         ResponseEntity<String> response = restTemplate.exchange(POST_ENDPOINT, HttpMethod.POST, entity, String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -111,9 +110,7 @@ public class ApiValidationTests {
                   "expiration_time_in_minutes": 3
                 }
                 """;
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
+        HttpEntity<String> entity = createHttpEntity(requestBody);
 
         ResponseEntity<String> response = restTemplate.exchange(POST_ENDPOINT, HttpMethod.POST, entity, String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
@@ -124,9 +121,7 @@ public class ApiValidationTests {
         String requestBody = """
                 {}
                 """;
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
+        HttpEntity<String> entity = createHttpEntity(requestBody);
 
         ResponseEntity<String> response = restTemplate.exchange(POST_ENDPOINT, HttpMethod.POST, entity, String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -143,9 +138,7 @@ public class ApiValidationTests {
                   "faa": 303
                 }
                 """;
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
+        HttpEntity<String> entity = createHttpEntity(requestBody);
 
         ResponseEntity<String> response = restTemplate.exchange(POST_ENDPOINT, HttpMethod.POST, entity, String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -160,9 +153,7 @@ public class ApiValidationTests {
                   "note_contents": "dummy note content"
                 }
                 """;
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
+        HttpEntity<String> entity = createHttpEntity(requestBody);
 
         ResponseEntity<String> response = restTemplate.exchange(POST_ENDPOINT, HttpMethod.POST, entity, String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -177,9 +168,7 @@ public class ApiValidationTests {
                   "note_contents": "dummy note content"
                 }
                 """;
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
+        HttpEntity<String> entity = createHttpEntity(requestBody);
 
         ResponseEntity<String> response = restTemplate.exchange(POST_ENDPOINT, HttpMethod.POST, entity, String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -194,9 +183,7 @@ public class ApiValidationTests {
                   "note_contents": "dummy note content"
                 }
                 """;
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
+        HttpEntity<String> entity = createHttpEntity(requestBody);
 
         ResponseEntity<String> response = restTemplate.exchange(POST_ENDPOINT, HttpMethod.POST, entity, String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -211,9 +198,7 @@ public class ApiValidationTests {
                   "note_contents": "dummy note content"
                 }
                 """;
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
+        HttpEntity<String> entity = createHttpEntity(requestBody);
 
         ResponseEntity<String> response = restTemplate.exchange(POST_ENDPOINT, HttpMethod.POST, entity, String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -228,9 +213,7 @@ public class ApiValidationTests {
                   "note_contents": "dummy note content"
                 }
                 """;
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
+        HttpEntity<String> entity = createHttpEntity(requestBody);
 
         ResponseEntity<String> response = restTemplate.exchange(POST_ENDPOINT, HttpMethod.POST, entity, String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -244,7 +227,7 @@ public class ApiValidationTests {
                   "note_contents": "dummy note content"
                 }
                 """;
-        entity = new HttpEntity<>(requestBody, headers);
+        entity = createHttpEntity(requestBody);
         response = restTemplate.exchange(POST_ENDPOINT, HttpMethod.POST, entity, String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(response.getBody()).isEqualTo(PARSE_ERROR_MESSAGE);
@@ -257,7 +240,7 @@ public class ApiValidationTests {
                   "note_contents": "dummy note content"
                 }
                 """;
-        entity = new HttpEntity<>(requestBody, headers);
+        entity = createHttpEntity(requestBody);
         response = restTemplate.exchange(POST_ENDPOINT, HttpMethod.POST, entity, String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(response.getBody()).isEqualTo(PARSE_ERROR_MESSAGE);
@@ -265,16 +248,14 @@ public class ApiValidationTests {
     }
 
     @Test
-    void test_noteContentsKey_incorrectSpelling_shouldReturn400() {
+    void test_payloadKey_incorrectSpelling_shouldReturn400() {
         String requestBody = """
                 {
                   "expiration_time_in_minutes": 1,
                   "note_contnts": "dummy note content"
                 }
                 """;
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
+        HttpEntity<String> entity = createHttpEntity(requestBody);
 
         ResponseEntity<String> response = restTemplate.exchange(POST_ENDPOINT, HttpMethod.POST, entity, String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -288,7 +269,7 @@ public class ApiValidationTests {
                   "post_contents": "dummy note content"
                 }
                 """;
-        entity = new HttpEntity<>(requestBody, headers);
+        entity = createHttpEntity(requestBody);
         response = restTemplate.exchange(POST_ENDPOINT, HttpMethod.POST, entity, String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(response.getBody()).isEqualTo(PARSE_ERROR_MESSAGE);
@@ -301,7 +282,7 @@ public class ApiValidationTests {
                   "notecontents": "dummy note content"
                 }
                 """;
-        entity = new HttpEntity<>(requestBody, headers);
+        entity = createHttpEntity(requestBody);
         response = restTemplate.exchange(POST_ENDPOINT, HttpMethod.POST, entity, String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(response.getBody()).isEqualTo(PARSE_ERROR_MESSAGE);
@@ -314,23 +295,22 @@ public class ApiValidationTests {
                   "": "dummy note content"
                 }
                 """;
-        entity = new HttpEntity<>(requestBody, headers);
+        entity = createHttpEntity(requestBody);
         response = restTemplate.exchange(POST_ENDPOINT, HttpMethod.POST, entity, String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(response.getBody()).isEqualTo(PARSE_ERROR_MESSAGE);
     }
 
     @Test
-    void test_noteContentsKey_absence_shouldReturn400() {
+    void test_payloadKey_absence_shouldReturn400() {
         String requestBody = """
                 {
                   "expiration_time_in_minutes": 1,
                   "p": "dummy note content"
                 }
                 """;
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
+
+        HttpEntity<String> entity = createHttpEntity(requestBody);
 
         ResponseEntity<String> response = restTemplate.exchange(POST_ENDPOINT, HttpMethod.POST, entity, String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -342,7 +322,7 @@ public class ApiValidationTests {
                   "": "dummy note content"
                 }
                 """;
-        entity = new HttpEntity<>(requestBody, headers);
+        entity = createHttpEntity(requestBody);
         response = restTemplate.exchange(POST_ENDPOINT, HttpMethod.POST, entity, String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(response.getBody()).isEqualTo(PARSE_ERROR_MESSAGE);
@@ -353,23 +333,21 @@ public class ApiValidationTests {
                   "rueiroew59202": "dummy note content"
                 }
                 """;
-        entity = new HttpEntity<>(requestBody, headers);
+        entity = createHttpEntity(requestBody);
         response = restTemplate.exchange(POST_ENDPOINT, HttpMethod.POST, entity, String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(response.getBody()).isEqualTo(PARSE_ERROR_MESSAGE);
     }
 
     @Test
-    void test_noteContentValue_empty_shouldReturn400() {
+    void test_payloadValue_empty_shouldReturn400() {
         String requestBody = """
                 {
                   "expiration_time_in_minutes": 3,
                   "note_contents": ""
                 }
                 """;
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
+        HttpEntity<String> entity = createHttpEntity(requestBody);
 
         ResponseEntity<String> response = restTemplate.exchange(POST_ENDPOINT, HttpMethod.POST, entity, String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -379,22 +357,62 @@ public class ApiValidationTests {
 //    @Test //todo: results in a JSON parse error: Illegal unquoted character ((CTRL-CHAR, code 18)): has to be escaped using backslash to be included in string value
             //todo: later on check if the parsing of certain characters gives errors with JSON
     @Test
-    void test_noteContentValue_tooLarge_shouldReturn400() {
+    void test_payloadValue_tooLarge_shouldReturn400() {
         String tooLargeString = RandomStringUtils.randomAlphanumeric(1_000_001);
 
         String requestBody = """
                 {
                   "expiration_time_in_minutes": 3,
-                  "note_contents": \"%s\"
+                  "note_contents": "%s"
                 }
                 """.formatted(tooLargeString);
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
+        HttpEntity<String> entity = createHttpEntity(requestBody);
 
         ResponseEntity<String> response = restTemplate.exchange(POST_ENDPOINT, HttpMethod.POST, entity, String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(response.getBody()).isEqualTo("Input validation error: Character limit exceeded. The maximum allowed is 1 million characters.");
     }
+
+    @Test
+    void test_requestHeader_UTF8_shouldPass(){
+        String requestBody = """
+                {
+                  "expiration_time_in_minutes": 3,
+                  "note_contents": "dummy note content"
+                }
+                """;
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.put("Content-Type", List.of("application/json;charset=UTF-8"));
+        HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(POST_ENDPOINT, HttpMethod.POST, entity, String.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+    }
+
+    @Test
+    void test_requestHeader_notUTF8_shouldReturn400(){
+        String requestBody = """
+                {
+                  "expiration_time_in_minutes": 3,
+                  "note_contents": "dummy note content"
+                }
+                """;
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.put("Content-Type", List.of("application/json;charset=UTF-16"));
+        HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(POST_ENDPOINT, HttpMethod.POST, entity, String.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).isEqualTo("Content-Type 'application/json;charset=UTF-16' is not supported");
+    }
+
+    private HttpEntity<String> createHttpEntity(String requestBody) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        return new HttpEntity<>(requestBody, headers);
+    }
+
 }

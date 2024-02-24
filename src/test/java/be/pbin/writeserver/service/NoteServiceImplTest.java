@@ -2,9 +2,11 @@ package be.pbin.writeserver.service;
 
 import be.pbin.writeserver.api.NoteData;
 import be.pbin.writeserver.data.metadata.NoteMetaData;
-import be.pbin.writeserver.data.payload.NotePayload;
+import be.pbin.writeserver.data.payload.Payload;
 import be.pbin.writeserver.data.payload.PayloadRepository;
 import be.pbin.writeserver.data.metadata.NoteMetadataRepository;
+import be.pbin.writeserver.data.payload.validation.InvalidPayloadException;
+import be.pbin.writeserver.service.implementations.NoteServiceImpl;
 import be.pbin.writeserver.utils.UriUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,43 +22,47 @@ import java.time.LocalDateTime;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class NoteServiceImplementationTest {
+class NoteServiceImplTest {
 
     @Mock
     private NoteMetadataRepository metadataRepository;
     @Mock
     private PayloadRepository payloadRepository;
 
+    @Mock
+    private ValidationService validationService;
+
     @InjectMocks
-    private NoteServiceImplementation noteService;
+    private NoteServiceImpl noteService;
 
     @Test
-    void test_saveNote() {
+    void test_saveNote() throws InvalidPayloadException {
         String payload = RandomStringUtils.randomAlphabetic(10);
         String path_to_payload = RandomStringUtils.randomAlphabetic(10);
         int expiration = Integer.parseInt(RandomStringUtils.randomNumeric(2));
         NoteData note = new NoteData(expiration, payload);
 
-        doReturn(path_to_payload).when(payloadRepository).savePayload(any(NotePayload.class));
+        doReturn(path_to_payload).when(payloadRepository).savePayload(any(Payload.class));
 
         URI result = noteService.save(note);
         String uniqueNoteId = UriUtils.extractLastSegment(result);
 
-        ArgumentCaptor<NotePayload> blobCaptor = ArgumentCaptor.forClass(NotePayload.class);
-        verify(payloadRepository).savePayload(blobCaptor.capture());
+        ArgumentCaptor<Payload> blobCaptor = ArgumentCaptor.forClass(Payload.class);
+        verify(payloadRepository, times(1)).savePayload(blobCaptor.capture());
 
-        NotePayload capturedPayload = blobCaptor.getValue();
-        assertThat(capturedPayload.getId()).isEqualTo(uniqueNoteId);
-        assertThat(capturedPayload.getPayload()).isEqualTo(payload);
+        Payload capturedPayload = blobCaptor.getValue();
+        assertThat(capturedPayload.id()).isEqualTo(uniqueNoteId);
+        assertThat(capturedPayload.payload()).isEqualTo(payload);
 
-        verify(metadataRepository).existsById(eq(uniqueNoteId));
+        verify(validationService, times(1)).validate(capturedPayload);
+
+        verify(metadataRepository, times(1)).existsById(eq(uniqueNoteId));
 
         ArgumentCaptor<NoteMetaData> metaDataCaptor = ArgumentCaptor.forClass(NoteMetaData.class);
-        verify(metadataRepository).save(metaDataCaptor.capture());
+        verify(metadataRepository, times(1)).save(metaDataCaptor.capture());
 
         NoteMetaData capturedMetaData = metaDataCaptor.getValue();
         assertThat(capturedMetaData.getPath()).isEqualTo(path_to_payload);
@@ -67,4 +73,6 @@ class NoteServiceImplementationTest {
         LocalDateTime now = LocalDateTime.now();
         assertThat(capturedMetaData.getCreationDate()).isBetween(justNow, now);
     }
+
+    //todo: exception test
 }

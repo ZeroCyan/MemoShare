@@ -12,7 +12,7 @@ public class NoteData {
     @JsonProperty("expiration_time_in_minutes") //todo: add JSON validation
     @Min(value = 0L, message = "Expiration time cannot be negative")
     @Max(value = 26_000_000, message = "Expiration time exceeds limit. Hint: Set expiration to 0 to prevent expiration.")
-    private int expirationTimeInMinutes;
+    private final int expirationTimeInMinutes;
 
     @JsonProperty(value = "note_contents")
     @NotNull(message = "'note_contents' must be present in the request. Hint: check spelling")
@@ -20,12 +20,13 @@ public class NoteData {
     @Size(max = 1_000_000, message = "Character limit exceeded. The maximum allowed is 1 million characters.")
     private final String noteContent;
 
-    public NoteData(int expirationTimeInMinutes, String noteContent) {
-        this.expirationTimeInMinutes = expirationTimeInMinutes;
+    public NoteData(String noteContent) {
+        this.expirationTimeInMinutes = 0;
         this.noteContent = noteContent;
     }
 
-    public NoteData(String noteContent) {
+    public NoteData(int expirationTimeInMinutes, String noteContent) {
+        this.expirationTimeInMinutes = expirationTimeInMinutes;
         this.noteContent = noteContent;
     }
 

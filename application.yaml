@@ -17,3 +17,14 @@ spring:
   jackson:
     deserialization:
       fail-on-unknown-properties: true
+  output:
+    ansi:
+      enabled: ALWAYS #enables colored log output
+
+azurite:
+  service:
+    key: Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==
+    connection: DefaultEndpointsProtocol=https;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=
+    account: devstoreaccount1
+    url: http://localhost:4242/
+    container: notes

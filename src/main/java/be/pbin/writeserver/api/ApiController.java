@@ -1,5 +1,6 @@
 package be.pbin.writeserver.api;
 
+import be.pbin.writeserver.data.payload.validation.InvalidPayloadException;
 import be.pbin.writeserver.service.NoteService;
 import jakarta.validation.Valid;
 import org.springframework.http.MediaType;
@@ -24,9 +25,9 @@ public class ApiController {
     }
 
     @PostMapping(value = "/note",
-            consumes = MediaType.APPLICATION_JSON_VALUE,
+            consumes =  "application/json;charset=UTF-8",
             produces = MediaType.APPLICATION_JSON_VALUE)
-    private ResponseEntity<String> noteData(@Valid @RequestBody NoteData noteData)  {
+    private ResponseEntity<String> noteData(@Valid @RequestBody NoteData noteData) throws InvalidPayloadException {
         URI uri = noteService.save(noteData);
         return ResponseEntity.created(uri).build();
     }
