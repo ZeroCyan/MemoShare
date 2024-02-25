@@ -1,7 +1,7 @@
 package be.pbin.writeserver.service.implementations;
 
 import be.pbin.writeserver.data.payload.Payload;
-import be.pbin.writeserver.data.payload.validation.InvalidPayloadException;
+import be.pbin.writeserver.data.payload.validation.PayloadValidationException;
 import be.pbin.writeserver.data.payload.validation.PayloadValidator;
 import be.pbin.writeserver.data.payload.validation.ValidationResult;
 import be.pbin.writeserver.data.payload.validation.ValidationStatus;
@@ -20,7 +20,7 @@ import static org.mockito.Mockito.*;
 class ValidationServiceImplTest {
 
     @Test
-    void test_noErrors() throws InvalidPayloadException {
+    void test_noErrors() throws PayloadValidationException {
         Payload payload = Payload.builder().build();
         ValidationResult validationResult = new ValidationResult(ValidationStatus.VALIDATED, new ArrayList<>());
 
@@ -52,7 +52,7 @@ class ValidationServiceImplTest {
         ValidationServiceImpl validationService = new ValidationServiceImpl(
                 List.of(payloadValidator1, payloadValidator2, payloadValidator3));
 
-        InvalidPayloadException thrown = assertThrows(InvalidPayloadException.class,
+        PayloadValidationException thrown = assertThrows(PayloadValidationException.class,
                 () -> validationService.validate(payload));
 
         assertThat(thrown.getMessage())

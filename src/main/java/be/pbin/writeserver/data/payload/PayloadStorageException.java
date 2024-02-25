@@ -1,6 +1,8 @@
 package be.pbin.writeserver.data.payload;
 
-public class PayloadStorageException extends Exception {
+import be.pbin.writeserver.data.DataProcessingException;
+
+public class PayloadStorageException extends DataProcessingException {
     public PayloadStorageException(String message, Throwable cause) {
         super(message, cause);
     }

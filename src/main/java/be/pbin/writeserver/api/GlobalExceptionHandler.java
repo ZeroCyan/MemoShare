@@ -1,7 +1,7 @@
 package be.pbin.writeserver.api;
 
 import be.pbin.writeserver.data.payload.PayloadStorageException;
-import be.pbin.writeserver.data.payload.validation.InvalidPayloadException;
+import be.pbin.writeserver.data.payload.validation.PayloadValidationException;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
@@ -65,8 +65,8 @@ public class GlobalExceptionHandler {
         return ResponseEntity.notFound().build();
     }
 
-    @ExceptionHandler(InvalidPayloadException.class)
-    public ResponseEntity<String> handleInvalidPayloadException(InvalidPayloadException exception) {
+    @ExceptionHandler(PayloadValidationException.class)
+    public ResponseEntity<String> handleInvalidPayloadException(PayloadValidationException exception) {
         return ResponseEntity.badRequest().body("Invalid payload content detected.");
     }
 

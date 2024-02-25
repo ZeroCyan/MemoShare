@@ -1,7 +1,7 @@
 package be.pbin.writeserver.service.implementations;
 
 import be.pbin.writeserver.data.payload.Payload;
-import be.pbin.writeserver.data.payload.validation.InvalidPayloadException;
+import be.pbin.writeserver.data.payload.validation.PayloadValidationException;
 import be.pbin.writeserver.data.payload.validation.PayloadValidator;
 import be.pbin.writeserver.data.payload.validation.ValidationResult;
 import be.pbin.writeserver.data.payload.validation.ValidationStatus;
@@ -26,13 +26,13 @@ public class ValidationServiceImpl implements ValidationService {
 
     //FIXME: the unintuitiveness of testing this class suggests there is a cleaner way.
     @Override
-    public void validate(Payload payload) throws InvalidPayloadException {
+    public void validate(Payload payload) throws PayloadValidationException {
         ValidationResult validationResult = this.validatePayload(payload);
 
         if (validationResult.validationStatus() == ValidationStatus.INVALID) {
             String errorMessage = "Payload validation errors encountered: " + String.join(" :: ", validationResult.errors());
             logger.warn(errorMessage);
-            throw new InvalidPayloadException(errorMessage);
+            throw new PayloadValidationException(errorMessage);
         }
     }
 

@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface MetadataRepository extends CrudRepository<MetaData, String> {
 
-    List<MetaData> findByExpirationDateBefore(LocalDateTime dateTime); //todo: should be paged
+    List<MetaData> findByExpirationDateBefore(LocalDateTime dateTime); //NiceToHave: Paged result
 }

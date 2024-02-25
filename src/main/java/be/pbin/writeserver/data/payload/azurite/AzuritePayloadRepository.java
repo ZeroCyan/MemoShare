@@ -3,6 +3,7 @@ package be.pbin.writeserver.data.payload.azurite;
 import be.pbin.writeserver.data.payload.Payload;
 import be.pbin.writeserver.data.payload.PayloadStorageException;
 import be.pbin.writeserver.data.payload.PayloadRepository;
+import com.azure.core.exception.AzureException;
 import com.azure.storage.blob.BlobClient;
 import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.models.BlobStorageException;
@@ -31,7 +32,7 @@ public class AzuritePayloadRepository implements PayloadRepository {
             try (InputStream inputStream = new ByteArrayInputStream(payload.payload().getBytes())){
                 blobClient.upload(inputStream);
             } catch (BlobStorageException | IOException exception) {
-                //NOTE: unsure if this is good practice. The idea is to handle the IOException where it occurs,
+                //Question: unsure if this is good practice. The idea is to handle the IOException where it occurs,
                 // and let GlobalExceptionHandler.handleGeneralException() handle the response to the client.
                 throw new PayloadStorageException("Error occurred during payload upload to Azure storage.", exception);
             }
@@ -45,9 +46,9 @@ public class AzuritePayloadRepository implements PayloadRepository {
         try {
             blobClient.delete();
         } catch (BlobStorageException exception) {
-            log.error("Error deleting blob in azure storage: {}", exception.getMessage(), exception);
-        } catch (RuntimeException exception) {
-            log.error("Unexpected error deleting blob in azure storage: {}", exception.getMessage(), exception);
+            log.error("Error deleting blob in azure storage: Error code={}, Message={}", exception.getErrorCode(), exception.getMessage(), exception);
+        } catch (AzureException exception) {
+            log.error("Unexpected error deleting blob in azure storage. Message= {}",exception.getMessage(), exception);
         }
     }
 

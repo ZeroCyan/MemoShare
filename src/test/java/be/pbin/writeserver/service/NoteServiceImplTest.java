@@ -1,12 +1,11 @@
 package be.pbin.writeserver.service;
 
 import be.pbin.writeserver.api.NoteDTO;
+import be.pbin.writeserver.data.DataProcessingException;
 import be.pbin.writeserver.data.metadata.MetaData;
 import be.pbin.writeserver.data.metadata.MetadataRepository;
 import be.pbin.writeserver.data.payload.Payload;
 import be.pbin.writeserver.data.payload.PayloadRepository;
-import be.pbin.writeserver.data.payload.PayloadStorageException;
-import be.pbin.writeserver.data.payload.validation.InvalidPayloadException;
 import be.pbin.writeserver.service.implementations.NoteServiceImpl;
 import be.pbin.writeserver.utils.UriUtils;
 import org.junit.jupiter.api.Test;
@@ -34,7 +33,6 @@ class NoteServiceImplTest {
     private MetadataRepository metadataRepository;
     @Mock
     private PayloadRepository payloadRepository;
-
     @Mock
     private ValidationService validationService;
 
@@ -42,7 +40,7 @@ class NoteServiceImplTest {
     private NoteServiceImpl noteService;
 
     @Test
-    void test_saveNote() throws InvalidPayloadException, PayloadStorageException {
+    void test_saveNote() throws DataProcessingException {
         String payload = RandomStringUtils.randomAlphabetic(10);
         String path_to_payload = RandomStringUtils.randomAlphabetic(10);
         int expiration = Integer.parseInt(RandomStringUtils.randomNumeric(3));
@@ -77,5 +75,42 @@ class NoteServiceImplTest {
         assertThat(capturedMetaData.getCreationDate()).isBetween(justNow, now);
     }
 
+    @Test
+    void test_saveNote_noExpiration() throws DataProcessingException {
+        String payload = RandomStringUtils.randomAlphabetic(10);
+        String path_to_payload = RandomStringUtils.randomAlphabetic(10);
+        int expiration = 0;
+        NoteDTO note = new NoteDTO(expiration, payload);
+
+        doReturn(path_to_payload).when(payloadRepository).save(any(Payload.class));
+
+        URI result = noteService.save(note);
+        String uniqueNoteId = UriUtils.extractLastSegment(result);
+
+        ArgumentCaptor<Payload> blobCaptor = ArgumentCaptor.forClass(Payload.class);
+        verify(payloadRepository, times(1)).save(blobCaptor.capture());
+
+        Payload capturedPayload = blobCaptor.getValue();
+        assertThat(capturedPayload.id()).isEqualTo(uniqueNoteId);
+        assertThat(capturedPayload.payload()).isEqualTo(payload);
+
+        verify(validationService, times(1)).validate(capturedPayload);
+
+        verify(metadataRepository, times(1)).existsById(eq(uniqueNoteId));
+
+        ArgumentCaptor<MetaData> metaDataCaptor = ArgumentCaptor.forClass(MetaData.class);
+        verify(metadataRepository, times(1)).save(metaDataCaptor.capture());
+
+        MetaData capturedMetaData = metaDataCaptor.getValue();
+        assertThat(capturedMetaData.getPath()).isEqualTo(path_to_payload);
+        assertThat(capturedMetaData.getExpirationDate()).isEqualTo(LocalDateTime.of(9999, 12, 31, 0, 0, 0));
+        assertThat(capturedMetaData.getShortLink()).isEqualTo(uniqueNoteId);
+
+        LocalDateTime justNow = LocalDateTime.now().minusSeconds(1);
+        LocalDateTime now = LocalDateTime.now();
+        assertThat(capturedMetaData.getCreationDate()).isBetween(justNow, now);
+    }
+
     //todo: exception tests
+
 }

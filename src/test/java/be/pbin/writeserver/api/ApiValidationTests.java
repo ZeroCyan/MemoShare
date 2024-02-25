@@ -347,8 +347,7 @@ public class ApiValidationTests {
         assertThat(response.getBody()).isEqualTo("Input validation error: Character limit exceeded. The maximum allowed is 1 million characters.");
     }
 
-    //todo: add test that asserts that fractional minutes are disallowed
-
+    //NiceToHave: add test that asserts that fractional minutes are disallowed
 
     private HttpEntity<String> createHttpEntity(String requestBody) {
         HttpHeaders headers = new HttpHeaders();
