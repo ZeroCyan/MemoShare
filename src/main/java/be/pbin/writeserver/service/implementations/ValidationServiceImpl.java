@@ -24,7 +24,7 @@ public class ValidationServiceImpl implements ValidationService {
         this.validationChain = validationChain;
     }
 
-    //todo: the unintuitiveness of testing this class suggests there is a cleaner way.
+    //FIXME: the unintuitiveness of testing this class suggests there is a cleaner way.
     @Override
     public void validate(Payload payload) throws InvalidPayloadException {
         ValidationResult validationResult = this.validatePayload(payload);

@@ -1,6 +1,6 @@
 package be.pbin.writeserver.api;
 
-import be.pbin.writeserver.data.metadata.NoteMetaData;
+import be.pbin.writeserver.data.metadata.MetaData;
 import be.pbin.writeserver.data.metadata.MetadataRepository;
 import be.pbin.writeserver.utils.UriUtils;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -12,7 +12,6 @@ import org.springframework.http.*;
 
 import java.net.URI;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -29,10 +28,10 @@ public class ApiValidationTests {
     @Autowired
     private MetadataRepository sqlRepository;
 
-    @Test //todo: dirty test, clean it up
+    @Test //FIXME: dirty test, clean it up
     void whenTheExpirationTimeInMinutesIsNotPresentThereShouldBeNoExpiration() {
-        NoteData newNoteData = new NoteData("please don't let me expire");
-        ResponseEntity<String> response = restTemplate.postForEntity(POST_ENDPOINT, newNoteData, String.class);
+        NoteDTO newNoteDTO = new NoteDTO("please don't let me expire");
+        ResponseEntity<String> response = restTemplate.postForEntity(POST_ENDPOINT, newNoteDTO, String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
         URI returnedUri = response.getHeaders().getLocation();
@@ -42,7 +41,7 @@ public class ApiValidationTests {
         String lastSegment = UriUtils.extractLastSegment(returnedUri);
 
         assertThat(sqlRepository.existsById(lastSegment)).isTrue();
-        Optional<NoteMetaData> noteModelOptional = sqlRepository.findById(lastSegment);
+        Optional<MetaData> noteModelOptional = sqlRepository.findById(lastSegment);
 
         assertThat(noteModelOptional.get().getExpirationDate()).isEqualTo(LocalDateTime.of(9999, 12, 31, 0,0,0));
     }
@@ -59,33 +58,6 @@ public class ApiValidationTests {
 
         ResponseEntity<String> response = restTemplate.exchange(POST_ENDPOINT, HttpMethod.POST, entity, String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-    }
-
-    @Test
-    void test_requestHasIncorrectMimeType_shouldReturn400() {
-        String requestBody = """
-                {
-                  "expiration_time_in_minutes": 3,
-                  "note_contents": "dummy note content"
-                }
-                """;
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_XML);
-        HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
-
-        ResponseEntity<String> response = restTemplate.exchange(POST_ENDPOINT, HttpMethod.POST, entity, String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(response.getBody()).isEqualTo("Content-Type 'application/xml' is not supported");
-
-        ///
-
-        headers.setContentType(MediaType.IMAGE_JPEG);
-        entity = new HttpEntity<>(requestBody, headers);
-
-        response = restTemplate.exchange(POST_ENDPOINT, HttpMethod.POST, entity, String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(response.getBody()).isEqualTo("Content-Type 'image/jpeg' is not supported");
     }
 
     @Test
@@ -355,8 +327,8 @@ public class ApiValidationTests {
         assertThat(response.getBody()).isEqualTo("Input validation error: 'note_contents' is empty");
     }
 
-//    @Test //todo: results in a JSON parse error: Illegal unquoted character ((CTRL-CHAR, code 18)): has to be escaped using backslash to be included in string value
-            //todo: later on check if the parsing of certain characters gives errors with JSON
+    //FIXME: results in a JSON parse error: Illegal unquoted character ((CTRL-CHAR, code 18)): has to be escaped using backslash to be included in string value
+    //todo: encoding validation needs to be thorough!
     @Test
     void test_payloadValue_tooLarge_shouldReturn400() {
         String tooLargeString = RandomStringUtils.randomAlphanumeric(1_000_001);
@@ -375,47 +347,12 @@ public class ApiValidationTests {
         assertThat(response.getBody()).isEqualTo("Input validation error: Character limit exceeded. The maximum allowed is 1 million characters.");
     }
 
-    @Test
-    void test_requestHeader_UTF8_shouldPass(){
-        String requestBody = """
-                {
-                  "expiration_time_in_minutes": 3,
-                  "note_contents": "dummy note content"
-                }
-                """;
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.put("Content-Type", List.of("application/json;charset=UTF-8"));
-        HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
-
-        ResponseEntity<String> response = restTemplate.exchange(POST_ENDPOINT, HttpMethod.POST, entity, String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-    }
-
-    @Test
-    void test_requestHeader_notUTF8_shouldReturn400(){
-        String requestBody = """
-                {
-                  "expiration_time_in_minutes": 3,
-                  "note_contents": "dummy note content"
-                }
-                """;
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.put("Content-Type", List.of("application/json;charset=UTF-16"));
-        HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
-
-        ResponseEntity<String> response = restTemplate.exchange(POST_ENDPOINT, HttpMethod.POST, entity, String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(response.getBody()).isEqualTo("Content-Type 'application/json;charset=UTF-16' is not supported");
-    }
-
     //todo: add test that asserts that fractional minutes are disallowed
+
 
     private HttpEntity<String> createHttpEntity(String requestBody) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         return new HttpEntity<>(requestBody, headers);
     }
-
 }

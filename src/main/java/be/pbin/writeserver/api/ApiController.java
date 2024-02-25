@@ -1,5 +1,6 @@
 package be.pbin.writeserver.api;
 
+import be.pbin.writeserver.data.payload.PayloadStorageException;
 import be.pbin.writeserver.data.payload.validation.InvalidPayloadException;
 import be.pbin.writeserver.service.NoteService;
 import jakarta.validation.Valid;
@@ -27,8 +28,9 @@ public class ApiController {
     @PostMapping(value = "/note",
             consumes =  "application/json;charset=UTF-8",
             produces = MediaType.APPLICATION_JSON_VALUE)
-    private ResponseEntity<String> noteData(@Valid @RequestBody NoteData noteData) throws InvalidPayloadException {
-        URI uri = noteService.save(noteData);
+    private ResponseEntity<String> createNoteData(@Valid @RequestBody NoteDTO noteDTO)
+            throws InvalidPayloadException, PayloadStorageException {
+        URI uri = noteService.save(noteDTO);
         return ResponseEntity.created(uri).build();
     }
 }

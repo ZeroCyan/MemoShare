@@ -13,21 +13,21 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ApiJsonTest {
 
     @Autowired
-    private JacksonTester<NoteData> json;
+    private JacksonTester<NoteDTO> json;
 
     @Test
     void noteDataSerializationTest() throws IOException {
-        NoteData noteData = new NoteData(60, "dummy note content");
+        NoteDTO noteDTO = new NoteDTO(60, "dummy note content");
 
-        assertThat(json.write(noteData)).isStrictlyEqualToJson("expected.json");
+        assertThat(json.write(noteDTO)).isStrictlyEqualToJson("expected.json");
 
-        assertThat(json.write(noteData)).hasJsonPathNumberValue("@.expiration_time_in_minutes");
-        assertThat(json.write(noteData))
+        assertThat(json.write(noteDTO)).hasJsonPathNumberValue("@.expiration_time_in_minutes");
+        assertThat(json.write(noteDTO))
                 .extractingJsonPathNumberValue("@.expiration_time_in_minutes")
                 .isEqualTo(60);
 
-        assertThat(json.write(noteData)).hasJsonPathStringValue("@.note_contents");
-        assertThat(json.write(noteData))
+        assertThat(json.write(noteDTO)).hasJsonPathStringValue("@.note_contents");
+        assertThat(json.write(noteDTO))
                 .extractingJsonPathStringValue("@.note_contents")
                 .isEqualTo("dummy note content");
     }
@@ -40,7 +40,7 @@ public class ApiJsonTest {
                   "note_contents": "dummy note content"
                 }
                 """;
-        assertThat(json.parse(expected)).isEqualTo(new NoteData(60, "dummy note content"));
+        assertThat(json.parse(expected)).isEqualTo(new NoteDTO(60, "dummy note content"));
         assertThat(json.parseObject(expected).getExpirationTimeInMinutes()).isEqualTo(60);
         assertThat(json.parseObject(expected).getNoteContent()).isEqualTo("dummy note content");
     }

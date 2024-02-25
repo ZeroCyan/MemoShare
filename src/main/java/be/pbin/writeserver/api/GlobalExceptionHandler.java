@@ -1,5 +1,6 @@
 package be.pbin.writeserver.api;
 
+import be.pbin.writeserver.data.payload.PayloadStorageException;
 import be.pbin.writeserver.data.payload.validation.InvalidPayloadException;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
@@ -16,12 +17,12 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
-import java.util.Arrays;
-
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+    Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
+    private static final String UNEXPECTED_ERROR_MESSAGE = "An unexpected error occurred, please try again later.";
 
     @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
     public ResponseEntity<String> handleUnsupportedHttpMime(HttpMediaTypeNotSupportedException exception) {
@@ -30,7 +31,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<String> handleHttpMessageNotReadableExceptions(HttpMessageNotReadableException exception) {
-        //todo: Dirty solution. Hacky, works for now, but don't lose sight of the sword of technical debt hanging over your head
+        //FIXME: Dirty solution. Hacky, works for now, but don't lose sight of the sword of technical debt hanging over your head
         // context: Some error messages are custom and provided with annotations on noteData, others derived from Jackson internals.
         // some messages in these exceptions reveal internals of application (e.g. fully qualified class names)
         Throwable cause = exception.getCause();
@@ -69,12 +70,15 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body("Invalid payload content detected.");
     }
 
+    @ExceptionHandler(PayloadStorageException.class)
+    public ResponseEntity<String> handlePayloadStorageException(PayloadStorageException exception) {
+        log.error(exception.getMessage(), exception);
+        return ResponseEntity.internalServerError().body(UNEXPECTED_ERROR_MESSAGE);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleGeneralException(Exception exception) {
-        logger.warn("An unanticipated exception was intercepted:"
-                + exception.getMessage()
-                + "\n"
-                + Arrays.toString(exception.getStackTrace()));
-        return ResponseEntity.internalServerError().body("An unexpected error occurred.");
+        log.error("An unanticipated exception was intercepted: {}", exception.getMessage(), exception);
+        return ResponseEntity.internalServerError().body(UNEXPECTED_ERROR_MESSAGE);
     }
 }

@@ -16,7 +16,7 @@ public class DummyValidator implements PayloadValidator {
 
     @Override
     public ValidationResult validate(Payload payload) {
-        if (payload.payload().startsWith("DUMMY")){ //todo: remove. Function: to trigger a validation error from a request.
+        if (payload.payload().startsWith("DUMMY")){ //todo: Remove from production code. Function: to trigger a validation error from a request.
             return new ValidationResult(ValidationStatus.INVALID, List.of("DummyValidator: DUMMY triggered."));
         }
         return new ValidationResult(ValidationStatus.VALIDATED, new ArrayList<>());

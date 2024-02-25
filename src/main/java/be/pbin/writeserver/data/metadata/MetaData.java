@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class NoteMetaData {
+public class MetaData {
 
     @Id
     @Column(name = "short_link")
