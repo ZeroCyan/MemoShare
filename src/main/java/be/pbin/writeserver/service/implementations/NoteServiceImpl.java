@@ -60,7 +60,7 @@ public class NoteServiceImpl implements NoteService {
         } catch (DataAccessException exception) {
             log.error("Error during saving of metadata of note with id {}: {}", uniqueNoteId, exception.getMessage(), exception);
             payloadRepository.deleteById(uniqueNoteId);
-            throw new MetaDataException("Error during saving of metadata of note with id " + uniqueNoteId, exception);
+            throw new MetaDataException("Error during saving of metadata of note with id: " + uniqueNoteId, exception);
         }
         return URI.create("/api/get/" + uniqueNoteId);
     }

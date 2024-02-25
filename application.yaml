@@ -9,11 +9,8 @@ spring:
     url: jdbc:mysql://localhost:3306/mydb
     username: root
     password: password
-#    driverClassName: com.mysql.jdbc.Driver
   jpa:
     database-platform: org.hibernate.dialect.MySQLDialect
-  sql:
-    init:
   jackson:
     deserialization:
       fail-on-unknown-properties: true
