@@ -24,7 +24,7 @@ public class ApiController {
         return ResponseEntity.ok().header("forId", identifier).build();
     }
 
-    @PostMapping(value = "/note",
+    @PostMapping(value = "/save",
             consumes = "application/json;charset=UTF-8",
             produces = MediaType.APPLICATION_JSON_VALUE)
     private ResponseEntity<String> createNoteData(@Valid @RequestBody NoteDTO noteDTO) throws DataProcessingException {

@@ -17,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class WriteServerApplicationTests {
 
+    private static final String POST_ENDPOINT = "/api/save";
     @Autowired
     private TestRestTemplate restTemplate;
 
@@ -24,7 +25,7 @@ class WriteServerApplicationTests {
     void shouldCreateNewNoteObject() {
         NoteDTO newNoteDTO = new NoteDTO(10, "contents");
 
-        ResponseEntity<String> response = restTemplate.postForEntity("/api/note", newNoteDTO, String.class);
+        ResponseEntity<String> response = restTemplate.postForEntity(POST_ENDPOINT, newNoteDTO, String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
         URI returnedUri = response.getHeaders().getLocation();
@@ -40,7 +41,7 @@ class WriteServerApplicationTests {
     void shouldGenerateUniqueUrlForNewNote() {
         NoteDTO newNoteDTO = new NoteDTO(10, "contents");
 
-        ResponseEntity<String> response = restTemplate.postForEntity("/api/note", newNoteDTO, String.class);
+        ResponseEntity<String> response = restTemplate.postForEntity(POST_ENDPOINT, newNoteDTO, String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
         URI returnedUri = response.getHeaders().getLocation();

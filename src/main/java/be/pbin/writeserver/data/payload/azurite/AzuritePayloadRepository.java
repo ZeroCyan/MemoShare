@@ -1,8 +1,8 @@
 package be.pbin.writeserver.data.payload.azurite;
 
 import be.pbin.writeserver.data.payload.Payload;
-import be.pbin.writeserver.data.payload.PayloadStorageException;
 import be.pbin.writeserver.data.payload.PayloadRepository;
+import be.pbin.writeserver.data.payload.PayloadStorageException;
 import com.azure.core.exception.AzureException;
 import com.azure.storage.blob.BlobClient;
 import com.azure.storage.blob.BlobContainerClient;
@@ -28,15 +28,14 @@ public class AzuritePayloadRepository implements PayloadRepository {
 
         BlobClient blobClient = getBlobClient(payload.id());
 
-        if (payload.payload() != null) {
-            try (InputStream inputStream = new ByteArrayInputStream(payload.payload().getBytes())){
-                blobClient.upload(inputStream);
-            } catch (BlobStorageException | IOException exception) {
-                //Question: unsure if this is good practice. The idea is to handle the IOException where it occurs,
-                // and let GlobalExceptionHandler.handleGeneralException() handle the response to the client.
-                throw new PayloadStorageException("Error occurred during payload upload to Azure storage.", exception);
-            }
+        try (InputStream inputStream = new ByteArrayInputStream(payload.payload().getBytes())) {
+            blobClient.upload(inputStream);
+        } catch (BlobStorageException | IOException exception) {
+            //Question: unsure if this is good practice. The idea is to handle the IOException where it occurs,
+            // and let GlobalExceptionHandler.handleGeneralException() handle the response to the client.
+            throw new PayloadStorageException("Error occurred during payload upload to Azure storage.", exception);
         }
+
         return blobClient.getBlobUrl();
     }
 
@@ -48,7 +47,7 @@ public class AzuritePayloadRepository implements PayloadRepository {
         } catch (BlobStorageException exception) {
             log.error("Error deleting blob in azure storage: Error code={}, Message={}", exception.getErrorCode(), exception.getMessage(), exception);
         } catch (AzureException exception) {
-            log.error("Unexpected error deleting blob in azure storage. Message= {}",exception.getMessage(), exception);
+            log.error("Unexpected error deleting blob in azure storage. Message= {}", exception.getMessage(), exception);
         }
     }
 

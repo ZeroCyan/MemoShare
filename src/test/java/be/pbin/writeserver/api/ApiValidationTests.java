@@ -19,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class ApiValidationTests {
 
-    private static final String POST_ENDPOINT = "/api/note";
+    private static final String POST_ENDPOINT = "/api/save";
     private static final String PARSE_ERROR_MESSAGE = "Errors in request body detected: Refer to the API contract for the correct request body format.";
 
     @Autowired
@@ -130,7 +130,8 @@ public class ApiValidationTests {
 
         ResponseEntity<String> response = restTemplate.exchange(POST_ENDPOINT, HttpMethod.POST, entity, String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(response.getBody()).isEqualTo("JSON parse error: Cannot deserialize value of type `int` from String \"asdf\": not a valid `int` value");
+        assertThat(response.getBody()).isEqualTo( //todo: note expose this amount of detail in error towards client
+                "JSON parse error: Cannot deserialize value of type `java.lang.Integer` from String \"asdf\": not a valid `java.lang.Integer` value");
     }
 
     @Test
