@@ -1,7 +1,7 @@
 package be.pbin.writeserver.data.payload.azurite;
 
 import be.pbin.writeserver.data.payload.Payload;
-import be.pbin.writeserver.data.payload.PayloadRepository;
+import be.pbin.writeserver.data.PayloadRepository;
 import be.pbin.writeserver.data.payload.PayloadStorageException;
 import com.azure.core.exception.AzureException;
 import com.azure.storage.blob.BlobClient;
@@ -56,7 +56,7 @@ public class AzuritePayloadRepository implements PayloadRepository {
      * A {@link BlobClient} represents an individual blob.
      */
     private BlobClient getBlobClient(String payloadId) {
-        BlobContainerClient containerClient = ContainerClientFactory.getContainerClient();
+        BlobContainerClient containerClient = AzureContainerClientFactory.getContainerClient();
         containerClient.createIfNotExists();
         return containerClient.getBlobClient(payloadId);
     }

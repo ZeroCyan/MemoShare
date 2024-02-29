@@ -4,10 +4,9 @@ import be.pbin.writeserver.api.NoteDTO;
 import be.pbin.writeserver.data.DataProcessingException;
 import be.pbin.writeserver.data.metadata.MetaData;
 import be.pbin.writeserver.data.metadata.MetaDataException;
-import be.pbin.writeserver.data.metadata.MetadataRepository;
+import be.pbin.writeserver.data.MetadataRepository;
 import be.pbin.writeserver.data.payload.Payload;
-import be.pbin.writeserver.data.payload.PayloadRepository;
-import be.pbin.writeserver.service.implementations.NoteServiceImpl;
+import be.pbin.writeserver.data.PayloadRepository;
 import be.pbin.writeserver.utils.UriUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -37,8 +36,6 @@ class NoteServiceImplTest {
     private MetadataRepository metadataRepository;
     @Mock
     private PayloadRepository payloadRepository;
-    @Mock
-    private ValidationService validationService;
 
     @InjectMocks
     private NoteServiceImpl noteService;
@@ -61,8 +58,6 @@ class NoteServiceImplTest {
         Payload capturedPayload = blobCaptor.getValue();
         assertThat(capturedPayload.id()).isEqualTo(uniqueNoteId);
         assertThat(capturedPayload.payload()).isEqualTo(payload);
-
-        verify(validationService, times(1)).validate(capturedPayload);
 
         verify(metadataRepository, times(1)).existsById(eq(uniqueNoteId));
 
@@ -98,8 +93,6 @@ class NoteServiceImplTest {
         Payload capturedPayload = blobCaptor.getValue();
         assertThat(capturedPayload.id()).isEqualTo(uniqueNoteId);
         assertThat(capturedPayload.payload()).isEqualTo(payload);
-
-        verify(validationService, times(1)).validate(capturedPayload);
 
         verify(metadataRepository, times(1)).existsById(eq(uniqueNoteId));
 
@@ -140,8 +133,6 @@ class NoteServiceImplTest {
         assertThat(capturedPayload.payload()).isEqualTo(payload);
 
         String noteId = capturedPayload.id();
-
-        verify(validationService, times(1)).validate(capturedPayload);
 
         verify(metadataRepository, times(1)).existsById(eq(noteId));
 

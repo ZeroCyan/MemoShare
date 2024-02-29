@@ -11,9 +11,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ContainerClientFactory {
+public class AzureContainerClientFactory {
 
-    private static final Logger logger = LoggerFactory.getLogger(ContainerClientFactory.class);
+    private static final Logger logger = LoggerFactory.getLogger(AzureContainerClientFactory.class);
 
     @Getter
     private static BlobContainerClient containerClient;

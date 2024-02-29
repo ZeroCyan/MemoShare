@@ -18,6 +18,13 @@ spring:
     ansi:
       enabled: ALWAYS #enables colored log output
 
+logging:
+  level:
+    root:
+    be.pbin.writeserver: ERROR
+
+be.pbin.web-server.endpoint: "/api/note"
+
 azurite:
   service:
     key: Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==

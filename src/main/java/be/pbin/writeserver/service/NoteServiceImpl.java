@@ -1,17 +1,17 @@
-package be.pbin.writeserver.service.implementations;
+package be.pbin.writeserver.service;
 
 import be.pbin.writeserver.api.NoteDTO;
 import be.pbin.writeserver.data.DataProcessingException;
 import be.pbin.writeserver.data.metadata.MetaData;
 import be.pbin.writeserver.data.metadata.MetaDataException;
-import be.pbin.writeserver.data.metadata.MetadataRepository;
+import be.pbin.writeserver.data.MetadataRepository;
 import be.pbin.writeserver.data.payload.Payload;
-import be.pbin.writeserver.data.payload.PayloadRepository;
-import be.pbin.writeserver.service.NoteService;
-import be.pbin.writeserver.service.ValidationService;
+import be.pbin.writeserver.data.PayloadRepository;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
@@ -23,16 +23,17 @@ public class NoteServiceImpl implements NoteService {
 
     private static final Logger log = LoggerFactory.getLogger(NoteServiceImpl.class);
 
+    @Value("${be.pbin.web-server.endpoint}")
+    private String WEB_SERVER_ENDPOINT;
+
     private final MetadataRepository metadataRepository;
     private final PayloadRepository payloadRepository;
-    private final ValidationService validationService;
+
 
     public NoteServiceImpl(MetadataRepository metadataRepository,
-                           PayloadRepository payloadRepository,
-                           ValidationService validationService) {
+                           PayloadRepository payloadRepository) {
         this.metadataRepository = metadataRepository;
         this.payloadRepository = payloadRepository;
-        this.validationService = validationService;
     }
 
     @Override
@@ -43,8 +44,6 @@ public class NoteServiceImpl implements NoteService {
                 .id(uniqueNoteId)
                 .payload(noteDTO.getNoteContent())
                 .build();
-
-        validationService.validate(payload);
 
         String pathToPayload = payloadRepository.save(payload);
 
@@ -62,7 +61,7 @@ public class NoteServiceImpl implements NoteService {
             payloadRepository.deleteById(uniqueNoteId);
             throw new MetaDataException("Error during saving of metadata of note with id: " + uniqueNoteId, exception);
         }
-        return URI.create("/api/get/" + uniqueNoteId);
+        return URI.create(WEB_SERVER_ENDPOINT + "/" +uniqueNoteId);
     }
 
     private LocalDateTime calculateExpiration(NoteDTO noteDTO) {

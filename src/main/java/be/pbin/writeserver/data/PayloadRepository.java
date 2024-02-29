@@ -1,4 +1,7 @@
-package be.pbin.writeserver.data.payload;
+package be.pbin.writeserver.data;
+
+import be.pbin.writeserver.data.payload.Payload;
+import be.pbin.writeserver.data.payload.PayloadStorageException;
 
 public interface PayloadRepository {
 

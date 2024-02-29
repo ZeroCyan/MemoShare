@@ -1,8 +1,8 @@
 package be.pbin.writeserver.service.jobs;
 
 import be.pbin.writeserver.data.metadata.MetaData;
-import be.pbin.writeserver.data.metadata.MetadataRepository;
-import be.pbin.writeserver.data.payload.PayloadRepository;
+import be.pbin.writeserver.data.MetadataRepository;
+import be.pbin.writeserver.data.PayloadRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;

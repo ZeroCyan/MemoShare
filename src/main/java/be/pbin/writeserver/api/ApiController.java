@@ -19,11 +19,6 @@ public class ApiController {
         this.noteService = noteService;
     }
 
-    @GetMapping("/get/{identifier}") //todo: temporary get method, later will move to READ SERVER.
-    private ResponseEntity<String> getData(@PathVariable String identifier) {
-        return ResponseEntity.ok().header("forId", identifier).build();
-    }
-
     @PostMapping(value = "/save",
             consumes = "application/json;charset=UTF-8",
             produces = MediaType.APPLICATION_JSON_VALUE)
