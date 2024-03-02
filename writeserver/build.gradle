@@ -6,7 +6,7 @@ plugins {
 }
 
 group = 'be.pbin'
-version = '0.0.1-SNAPSHOT'
+version = '0.0.1'
 
 java {
 	sourceCompatibility = '21'
@@ -16,6 +16,10 @@ configurations {
 	compileOnly {
 		extendsFrom annotationProcessor
 	}
+}
+
+jar {
+	enabled = false // prevents the creation of *-plain.jar
 }
 
 repositories {

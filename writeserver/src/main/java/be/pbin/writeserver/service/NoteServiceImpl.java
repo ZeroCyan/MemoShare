@@ -2,13 +2,12 @@ package be.pbin.writeserver.service;
 
 import be.pbin.writeserver.api.NoteDTO;
 import be.pbin.writeserver.data.DataProcessingException;
+import be.pbin.writeserver.data.MetadataRepository;
+import be.pbin.writeserver.data.PayloadRepository;
 import be.pbin.writeserver.data.metadata.MetaData;
 import be.pbin.writeserver.data.metadata.MetaDataException;
-import be.pbin.writeserver.data.MetadataRepository;
 import be.pbin.writeserver.data.payload.Payload;
-import be.pbin.writeserver.data.PayloadRepository;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;

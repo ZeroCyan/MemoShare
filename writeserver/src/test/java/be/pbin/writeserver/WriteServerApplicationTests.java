@@ -18,6 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class WriteServerApplicationTests {
 
     private static final String POST_ENDPOINT = "/api/save";
+
     @Autowired
     private TestRestTemplate restTemplate;
 
@@ -30,11 +31,6 @@ class WriteServerApplicationTests {
 
         URI returnedUri = response.getHeaders().getLocation();
         assertThat(returnedUri).isNotNull();
-
-        //todo: temporary solution, since the GET notes endpoint will be part of the readserver
-        ResponseEntity<String> getResponse = restTemplate.getForEntity(returnedUri, String.class);
-        assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(getResponse.getHeaders()).containsKey("forId");
     }
 
     @Test

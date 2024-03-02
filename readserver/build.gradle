@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'be.pbin'
-version = '0.0.1-SNAPSHOT'
+version = '0.0.1'
 
 java {
 	sourceCompatibility = '21'
@@ -21,6 +21,10 @@ repositories {
 	mavenCentral()
 }
 
+jar {
+	enabled = false // prevents the creation of *-plain.jar
+}
+
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	// Data
@@ -32,8 +36,6 @@ dependencies {
 
 
 	compileOnly 'org.projectlombok:lombok'
-	developmentOnly 'org.springframework.boot:spring-boot-devtools'
-//	developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.boot:spring-boot-testcontainers'
