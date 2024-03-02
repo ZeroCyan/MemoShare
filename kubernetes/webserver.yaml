@@ -1,0 +1,89 @@
+apiVersion: app/v1
+kind: Deployment
+metadata:
+  name: webserver
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: webserver
+  template:
+    metadata:
+      labels:
+        app: webserver
+    spec:
+      containers:
+        - name: webserver
+          image: webserver
+          ports:
+            - containerPort: 8002
+          env:
+
+            # MYSQL
+            - name: CONFIG_MYSQL_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: memoshare-secret
+                  key: mysql-username
+            - name: CONFIG_MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: memoshare-secret
+                  key: mysql-password
+            - name: CONFIG_MYSQL_SERVER
+              valueFrom:
+                configMapKeyRef:
+                  name: memoshare-configmap
+                  key: database-url
+            - name: CONFIG_MYSQL_DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: memoshare-configmap
+                  key: database-name
+
+            # AZURITE
+            - name: CONFIG_AZURITE_ACCOUNT_KEY
+              valueFrom: 
+              configMapKeyRef:
+                name: memoshare-configmap
+                key: azurite-account-key
+            - name: CONFIG_AZURITE_ACCOUNT_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: memoshare-configmap
+                  key: azurite-account-name
+            - name: CONFIG_AZURITE_BLOB_ENDPOINT
+              valueFrom:
+                configMapKeyRef:
+                  name: memoshare-configmap
+                  key: azurite-blob-endpoint
+            - name: CONFIG_AZURITE_CONTAINER_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: memoshare-configmap
+                  key: azurite-container-name
+
+            # LOGGING
+            - name: WEBSERVER_ROOT_LOG_LEVEL
+              valueFrom:
+                configMapKeyRef:
+                  name: memoshare-configmap
+                  key: webserver-root-log-level
+            - name: WEBSERVER_APPLICATION_LOG_LEVEL
+              valueFrom:
+                configMapKeyRef:
+                  name: memoshare-configmap
+                  key: webserver-application-log-level
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: webserver-service
+spec:
+  selector:
+    app: webserver
+  ports:
+    - protocol: TCP
+      port: 8002
+      targetPort: 8080
+

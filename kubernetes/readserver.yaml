@@ -1,0 +1,89 @@
+apiVersion: app/v1
+kind: Deployment
+metadata:
+  name: readserver
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: readserver
+  template:
+    metadata:
+      labels:
+        app: readserver
+    spec:
+      containers:
+        - name: readserver
+          image: readserver
+          ports:
+            - containerPort: 8004
+          env:
+
+            # MYSQL
+            - name: CONFIG_MYSQL_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: memoshare-secret
+                  key: mysql-username
+            - name: CONFIG_MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: memoshare-secret
+                  key: mysql-password
+            - name: CONFIG_MYSQL_SERVER
+              valueFrom:
+                configMapKeyRef:
+                  name: memoshare-configmap
+                  key: database-url
+            - name: CONFIG_MYSQL_DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: memoshare-configmap
+                  key: database-name
+
+            # AZURITE
+            - name: CONFIG_AZURITE_ACCOUNT_KEY
+              valueFrom: 
+              configMapKeyRef:
+                name: memoshare-configmap
+                key: azurite-account-key
+            - name: CONFIG_AZURITE_ACCOUNT_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: memoshare-configmap
+                  key: azurite-account-name
+            - name: CONFIG_AZURITE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: memoshare-configmap
+                  key: azurite-url
+            - name: CONFIG_AZURITE_CONTAINER_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: memoshare-configmap
+                  key: azurite-container-name
+
+            # LOGGING
+            - name: READSERVER_ROOT_LOG_LEVEL
+              valueFrom:
+                configMapKeyRef:
+                  name: memoshare-configmap
+                  key: readserver-root-log-level
+            - name: READSERVER_APPLICATION_LOG_LEVEL
+              valueFrom:
+                configMapKeyRef:
+                  name: memoshare-configmap
+                  key: readserver-application-log-level
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: readserver-service
+spec:
+  selector:
+    app: readserver
+  ports:
+    - protocol: TCP
+      port: 8004
+      targetPort: 8080
+

@@ -1,14 +1,8 @@
-server:
-  address:
-    localhost
-  port:
-    8004
-
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/mydb
-    username: root
-    password: password
+    url: jdbc:mysql://${CONFIG_MYSQL_SERVER}/${CONFIG_MYSQL_DB_NAME}
+    username: ${CONFIG_MYSQL_USERNAME}
+    password: ${CONFIG_MYSQL_PASSWORD}
   jpa:
     database-platform: org.hibernate.dialect.MySQLDialect
   jackson:
@@ -20,12 +14,13 @@ spring:
 
 logging:
   level:
-    be.pbin.readserver: ERROR
+    root: ${ROOT_LOG_LEVEL}
+    be.pbin.readserver: ${APPLICATION_LOG_LEVEL}
 
 azurite:
   service:
-    key: Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==
+    key: ${CONFIG_AZURITE_ACCOUNT_KEY}
     connection: DefaultEndpointsProtocol=https;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=
-    account: devstoreaccount1
-    url: http://localhost:4242/
-    container: notes
+    account: ${CONFIG_AZURITE_ACCOUNT_NAME}
+    url: ${CONFIG_AZURITE_URL}
+    container: ${CONFIG_AZURITE_ACCOUNT_NAME}

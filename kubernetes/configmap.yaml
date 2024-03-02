@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: memoshare-configmap
+data:
+  database-url: mysql-service
+  database-name: memodb
+
+  azurite-url: azurite-service
+  azurite-container-name: memos
+  azurite-account-key: Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw== 
+  azurite-account-name: devstoreaccount1
+  
+  webserver-root-log-level: INFO
+  webserver-application-log-level: INFO
+
+  readserver-root-log-level: INFO
+  readserver-application-log-level: INFO
+
+  writeserver-root-log-level: INFO
+  writeserver-application-log-level: INFO
+

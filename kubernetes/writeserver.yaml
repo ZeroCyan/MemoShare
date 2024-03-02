@@ -1,0 +1,90 @@
+apiVersion: app/v1
+kind: Deployment
+metadata:
+  name: writeserver
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: writeserver
+  template:
+    metadata:
+      labels:
+        app: writeserver
+    spec:
+      containers:
+        - name: writeserver
+          image: writeserver
+          ports:
+            - containerPort: 8003
+          env:
+
+            # MYSQL
+            - name: CONFIG_MYSQL_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: memoshare-secret
+                  key: mysql-username
+            - name: CONFIG_MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: memoshare-secret
+                  key: mysql-password
+            - name: CONFIG_MYSQL_SERVER
+              valueFrom:
+                configMapKeyRef:
+                  name: memoshare-configmap
+                  key: database-url
+            - name: CONFIG_MYSQL_DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: memoshare-configmap
+                  key: database-name
+
+            # AZURITE
+            - name: CONFIG_AZURITE_ACCOUNT_KEY
+              valueFrom: 
+              configMapKeyRef:
+                name: memoshare-configmap
+                key: azurite-account-key
+            - name: CONFIG_AZURITE_ACCOUNT_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: memoshare-configmap
+                  key: azurite-account-name
+            - name: CONFIG_AZURITE_BLOB_ENDPOINT
+              valueFrom:
+                configMapKeyRef:
+                  name: memoshare-configmap
+                  key: azurite-blob-endpoint
+            - name: CONFIG_AZURITE_CONTAINER_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: memoshare-configmap
+                  key: azurite-container-name
+
+            # LOGGING
+            - name: WRITESERVER_ROOT_LOG_LEVEL
+              valueFrom:
+                configMapKeyRef:
+                  name: memoshare-configmap
+                  key: writeserver-root-log-level
+
+            - name: WRITESERVER_APPLICATION_LOG_LEVEL
+              valueFrom:
+                configMapKeyRef:
+                  name: memoshare-configmap
+                  key: writeserver-application-log-level
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: writeserver-service
+spec:
+  selector:
+    app: writeserver
+  ports:
+    - protocol: TCP
+      port: 8003
+      targetPort: 8080
+

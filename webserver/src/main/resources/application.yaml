@@ -1,9 +1,3 @@
-server:
-  address:
-    localhost
-  port:
-    8002
-
 spring:
   output:
     ansi:
@@ -11,14 +5,14 @@ spring:
 
 logging:
   level:
-    root: DEBUG
-    be.pbin.webserver: DEBUG
+    root: ${ROOT_LOG_LEVEL}
+    be.pbin.readserver: ${APPLICATION_LOG_LEVEL}
 
 be:
   pbin:
     write-server:
-      base-url: "http://localhost:8003"
+      url: ${WRITESERVER_URL}
       path: "/api/save"
     read-server:
-      base-url: "http://localhost:8004"
+      url: ${READSERVER_URL}
       path: "/api/get"
