@@ -4,6 +4,8 @@ import be.pbin.webserver.api.Note;
 import be.pbin.webserver.validation.PayloadValidationService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Getter;
+import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,6 +13,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.util.HtmlUtils;
 
 import java.io.IOException;
 import java.net.URI;
@@ -32,6 +35,8 @@ public class HttpClientServiceImpl implements HttpClientService {
     private String WRITE_SERVER_BASE_URL;
     @Value("${be.pbin.write-server.path}")
     private String WRITE_SERVER_PATH;
+    @Setter
+    @Getter
     @Value("${be.pbin.read-server.base-url}")
     private String READ_SERVER_BASE_URL;
     @Value("${be.pbin.read-server.path}")
@@ -48,26 +53,32 @@ public class HttpClientServiceImpl implements HttpClientService {
     @Override
     public ResponseEntity<String> get(String noteId) throws HttpClientRequestFailureException {
         String URL = READ_SERVER_BASE_URL + READ_SERVER_PATH + "/" + noteId;
+
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(URL))
                 .GET()
+                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                 .timeout(Duration.of(10, SECONDS))
                 .build();
 
         HttpResponse<String> response = executeRequest(request);
 
-        if (response.statusCode() == 404) {
-            throw new NoNoteFoundException("We couldn't locate the file you are looking for. Perhaps it has expired.");
-        }
+        int statusCode = response.statusCode();
 
-        if (response.statusCode() == 200 && response.body() != null) {
+        if (statusCode == 200 && response.body() != null) {
+            String responseBody = HtmlUtils.htmlEscape(response.body()); // Prevent XSS attacks
             return ResponseEntity.ok()
                     .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                    .body(response.body());
+                    .body(responseBody);
         }
 
-        log.error("Http POST request to read server failed with status code {}. Note id: {}", response.statusCode(), noteId);
-        throw new HttpClientRequestFailureException("HTTP POST request failed with status code: " + response.statusCode());
+        if (statusCode == 404) {
+            log.warn("Http GET request to read server failed with status code {}. Note id: {}", statusCode, noteId);
+            return ResponseEntity.notFound().build();
+        }
+
+        log.error("Http GET request to read server failed with status code {}. Note id: {}", statusCode, noteId);
+        return ResponseEntity.internalServerError().body("An internal server error occurred. Please try again later.");
     }
 
     @Override
@@ -95,7 +106,7 @@ public class HttpClientServiceImpl implements HttpClientService {
         }
 
         log.error("POST request to read server failed with status code {}.", response.statusCode());
-        throw new HttpClientRequestFailureException("POST request failed with status code: " + response.statusCode());
+        throw new HttpClientRequestFailureException();
     }
 
     private String serializeNote(Note note) throws HttpClientRequestFailureException {
@@ -103,27 +114,26 @@ public class HttpClientServiceImpl implements HttpClientService {
             return serializer.writeValueAsString(note);
         } catch (JsonProcessingException exception) {
             log.error("Could not serialize note: {}", note, exception);
-            throw new HttpClientRequestFailureException("Could not serialize note.");
+            throw new HttpClientRequestFailureException();
         }
     }
 
     private HttpResponse<String> executeRequest(HttpRequest request) throws HttpClientRequestFailureException {
-        HttpResponse<String> response = null;
+        HttpResponse<String> response;
 
         try (HttpClient client = HttpClient.newHttpClient()) {
             response = client.send(request, ofString());
         } catch (IOException exception) {
             log.error("An IO error occurred during a HTTP request: {}", exception.getMessage(), exception);
-            throw new HttpClientRequestFailureException("Failed to execute HTTP request due to IO error: " + exception.getMessage(), exception);
+            throw new HttpClientRequestFailureException();
         } catch (InterruptedException exception) {
             log.error("An interrupted exception occurred during a HTTP request: {}", exception.getMessage(), exception);
-            //todo: handle the generating and handling of exception messages better
-            throw new HttpClientRequestFailureException("Failed to execute HTTP request due to interupted exception: " + exception.getMessage(), exception);
+            throw new HttpClientRequestFailureException();
         }
 
         if (response == null) {
             log.error("An error occurred during a HTTP request, response object is null.");
-            throw new HttpClientRequestFailureException("HTTP Post request error: null response object.");
+            throw new HttpClientRequestFailureException();
         }
 
         return response;
@@ -133,15 +143,15 @@ public class HttpClientServiceImpl implements HttpClientService {
         java.net.http.HttpHeaders headers = response.headers();
 
         if (headers == null || headers.map().isEmpty()) {
-            log.error("POST request returned status 201 but no headers present. Response: {}", response.toString());
-            throw new HttpClientRequestFailureException("POST request status code 201, but no headers present");
+            log.error("POST request returned status 201 but no headers present. Response: {}", response);
+            throw new HttpClientRequestFailureException();
         }
 
         Optional<String> location = headers.firstValue("Location");
 
         if (location.isEmpty() || location.get().isEmpty()) {
             log.error("POST request returned status 201 but without Location in the header. Response: {}", response);
-            throw new HttpClientRequestFailureException("POST request status code 201, but no Location in header present");
+            throw new HttpClientRequestFailureException();
         }
 
         return location.get();

@@ -1,7 +1,15 @@
+# # # # # # # # # # # # #
+#                       #
+# Default Configuration #
+#                       #
+# # # # # # # # # # # # #
+
 spring:
-  output:
-    ansi:
-      enabled: ALWAYS #enables colored log output
+  output.ansi.enabled: ALWAYS #enables colored log output
+  jackson:
+    deserialization:
+      fail-on-unknown-properties: true
+
 
 logging:
   level:
@@ -16,3 +24,7 @@ be:
     read-server:
       url: ${READSERVER_URL}
       path: "/api/get"
+
+server:
+  error:
+    whitelabel.enabled: false
