@@ -15,7 +15,7 @@ spring:
 logging:
   level:
     root: ${ROOT_LOG_LEVEL}
-    be.pbin.readserver: ${APPLICATION_LOG_LEVEL}
+    be.pbin.writeserver: ${APPLICATION_LOG_LEVEL}
 
 azurite:
   service:

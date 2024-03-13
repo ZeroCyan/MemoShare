@@ -1,4 +1,4 @@
-package be.pbin.readserver.api;
+package be.pbin.readserver;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +16,10 @@ class ApiEndpointTests {
 
     @Autowired
     private TestRestTemplate restTemplate;
+
+
+    // 1. problem detail
+    // 2. all test cases
 
     @Test
     void test_getNote_happyPath() {
