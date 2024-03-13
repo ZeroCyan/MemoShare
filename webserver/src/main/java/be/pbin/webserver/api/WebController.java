@@ -1,6 +1,6 @@
 package be.pbin.webserver.api;
 
-import be.pbin.webserver.client.HttpClientRequestFailureException;
+import be.pbin.webserver.client.exceptions.HttpClientException;
 import be.pbin.webserver.client.HttpClientService;
 import jakarta.annotation.Nonnull;
 import jakarta.validation.Valid;
@@ -22,12 +22,12 @@ public class WebController {
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     private ResponseEntity<String> get(@Valid @Nonnull
                                        @Pattern(regexp = "^[a-zA-Z0-9]{8}$", message = "The request parameter must be 8 characters long and consist of alphanumeric characters.")
-                                       @RequestParam(name = "shortlink") String shortLink) throws HttpClientRequestFailureException {
+                                       @RequestParam(name = "shortlink") String shortLink) throws HttpClientException {
         return httpClientService.get(shortLink);
     }
 
     @PostMapping(consumes = "application/json;charset=UTF-8", produces = MediaType.APPLICATION_JSON_VALUE)
-    private ResponseEntity<Void> create(@Valid @RequestBody Note note) throws HttpClientRequestFailureException {
+    private ResponseEntity<String> create(@Valid @RequestBody Note note) throws HttpClientException {
         return httpClientService.post(note);
     }
 }

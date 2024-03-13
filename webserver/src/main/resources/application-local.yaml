@@ -1,4 +1,4 @@
-# WEBSERVER
+# WEBSERVER - Configuration for a local build
 
 spring:
   output.ansi.enabled: ALWAYS #enables colored log output
@@ -9,18 +9,19 @@ spring:
 
 logging:
   level:
-    root: ${ROOT_LOG_LEVEL}
-    be.pbin.webserver: ${APPLICATION_LOG_LEVEL}
+    root: info
+    be.pbin.webserver: info
 
 be:
   pbin:
     write-server:
-      base-url: ${WRITESERVER_URL}
+      base-url: "http://localhost:8003"
       path: "/api/save"
     read-server:
-      base-url: ${READSERVER_URL}
+      base-url: "http://localhost:8004"
       path: "/api/get"
 
 server:
+  port: 8002
   error:
     whitelabel.enabled: false

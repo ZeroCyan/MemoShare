@@ -12,22 +12,24 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.util.HtmlUtils;
+import org.springframework.test.context.ActiveProfiles;
 
-import java.io.IOException;
+import java.lang.reflect.Field;
+import java.util.Locale;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ActiveProfiles("test")
 public class ReadServerIntegrationTests {
 
     private static final String WEB_SERVER_GET_ENDPOINT = "/api/note";
     private static final String SHORTLINK_REQ_PARAM = "?shortlink=";
-    public static final String INTERNAL_SERVER_MESSAGE = "An internal server error occurred. Please try again later.";
 
     @Autowired
     private TestRestTemplate restTemplate;
@@ -35,8 +37,11 @@ public class ReadServerIntegrationTests {
     @Autowired
     private HttpClientServiceImpl httpClientService;
 
+    @Autowired
+    private MessageSource messageSource;
+
     @Test
-    void happyPath_responseBodyShouldBeEncoded() throws InterruptedException, IOException {
+    void readServerReturns200_shouldReturn200() throws Exception {
         String body = """
                 {
                   "created_at": "2024-02-20T15:30:45",
@@ -46,13 +51,20 @@ public class ReadServerIntegrationTests {
 
         ResponseEntity<String> response = executeGetRequestAndReturnStatusCode(200, body);
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(response.getBody(), HtmlUtils.htmlEscape(body));
+        assertEquals(response.getBody(), body);
     }
 
     @Test
-    void readServerReturns404_shouldReturn404() throws IOException, InterruptedException {
+    void readServerReturns404_shouldReturn404() throws Exception {
         ResponseEntity<String> response = executeGetRequestAndReturnStatusCode(404, "");
+
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+
+        String expectedBody = """
+                {"type":"about:blank","title":"Not Found","status":404,"detail":"%s","instance":"/api/note"}"""
+                .formatted(messageSource.getMessage("memoshare.error.not.found", null, Locale.getDefault()));
+
+        assertEquals(expectedBody, response.getBody());
     }
 
     /**
@@ -62,13 +74,19 @@ public class ReadServerIntegrationTests {
      */
     @ParameterizedTest
     @ValueSource(ints = {400, 401, 403, 405, 406, 429, 500})
-    void readServerReturnsX_shouldReturn500(int statusCode) throws IOException, InterruptedException {
+    void readServerReturnsX_shouldReturn500(int statusCode) throws Exception {
         ResponseEntity<String> response = executeGetRequestAndReturnStatusCode(statusCode, Strings.EMPTY);
+
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
-        assertEquals(INTERNAL_SERVER_MESSAGE, response.getBody());
+
+        String expectedBody = """
+                                {"type":"about:blank","title":"Internal Server Error","status":500,"detail":"%s","instance":"/api/note"}"""
+                                .formatted(messageSource.getMessage("memoshare.error.internal.server", null, Locale.getDefault()));
+
+        assertEquals(expectedBody, response.getBody());
     }
 
-    private ResponseEntity<String> executeGetRequestAndReturnStatusCode(int httpResponseCode, String responseBody) throws IOException, InterruptedException {
+    private ResponseEntity<String> executeGetRequestAndReturnStatusCode(int httpResponseCode, String responseBody) throws Exception {
         MockWebServer readServer = new MockWebServer();
 
         MockResponse mockResponse = new MockResponse();
@@ -79,8 +97,10 @@ public class ReadServerIntegrationTests {
 
         readServer.enqueue(mockResponse);
 
-        // Overwrite base url defined in test/resources/application.yaml
-        httpClientService.setREAD_SERVER_BASE_URL(readServer.url("").toString());
+        // Overwrite base url defined in test/resources/application-test.yaml through reflection
+        Field readServerBaseUrl = httpClientService.getClass().getDeclaredField("READ_SERVER_BASE_URL");
+        readServerBaseUrl.setAccessible(true);
+        readServerBaseUrl.set(httpClientService, readServer.url("").toString());
 
         // request to webserver
         String shortlink = RandomStringUtils.randomAlphanumeric(8);
@@ -95,7 +115,6 @@ public class ReadServerIntegrationTests {
 
         //
         assertThat(request.getHeader("Accept")).contains(MediaType.APPLICATION_JSON_VALUE);
-        System.out.println(request.getHeaders());
         readServer.close();
         return response;
     }

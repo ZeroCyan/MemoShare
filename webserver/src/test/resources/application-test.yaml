@@ -1,0 +1,30 @@
+server:
+  address:
+    localhost
+  port:
+    8002
+  error:
+    include-message: always
+
+spring:
+  output:
+    ansi:
+      enabled: ALWAYS #enables colored log output
+  jackson:
+    deserialization:
+      fail-on-unknown-properties: true
+
+
+logging:
+  level:
+    root:
+    be.pbin.webserver:
+
+be:
+  pbin:
+    write-server:
+      base-url: "http://localhost:8003"
+      path: "/api/save"
+    read-server:
+      base-url: "http://localhost:8004"
+      path: "/api/get"

@@ -1,7 +1,7 @@
 package be.pbin.webserver;
 
 import be.pbin.webserver.api.Note;
-import be.pbin.webserver.client.HttpClientRequestFailureException;
+import be.pbin.webserver.client.exceptions.HttpClientException;
 import be.pbin.webserver.client.HttpClientServiceImpl;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.json.JSONException;
@@ -14,6 +14,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.MessageSource;
 import org.springframework.http.*;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.net.URI;
 import java.util.List;
@@ -23,6 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ActiveProfiles("test")
 public class PostEndpointValidationTests {
 
     private static final String BAD_REQUEST_MESSAGE_TEMPLATE = """
@@ -64,7 +66,7 @@ public class PostEndpointValidationTests {
     }
 
     @Test
-    void requestBody_orderOfArrayElementsChanged_shouldPass() throws HttpClientRequestFailureException {
+    void requestBody_orderOfArrayElementsChanged_shouldPass() throws HttpClientException {
         String requestBody = """
                 {
                   "note_contents": "dummy note content",
@@ -74,7 +76,7 @@ public class PostEndpointValidationTests {
         HttpEntity<String> entity = createHttpEntity(requestBody);
 
         URI location = URI.create(RandomStringUtils.randomAlphanumeric(10));
-        ResponseEntity<Void> mockResponse = ResponseEntity.created(location).build();
+        ResponseEntity<String> mockResponse = ResponseEntity.created(location).build();
 
         Note note = new Note(3, "dummy note content");
         when(httpClientService.post(note)).thenReturn(mockResponse);
