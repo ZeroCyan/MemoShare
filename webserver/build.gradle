@@ -19,6 +19,12 @@ jar {
     enabled = false // prevents the creation of *-plain.jar
 }
 
+bootRun {
+    // allows CLI vars to be passed to gradle
+    //e.g: ./gradlew -Dspring.profiles.active=local bootRun
+    systemProperties System.properties
+}
+
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-validation:3.2.2'

@@ -19,11 +19,11 @@ public class WebController {
         this.httpClientService = httpClientService;
     }
 
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{id}", produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_PROBLEM_JSON_VALUE})
     private ResponseEntity<String> get(@Valid @Nonnull
                                        @Pattern(regexp = "^[a-zA-Z0-9]{8}$", message = "The request parameter must be 8 characters long and consist of alphanumeric characters.")
-                                       @RequestParam(name = "shortlink") String shortLink) throws HttpClientException {
-        return httpClientService.get(shortLink);
+                                       @PathVariable(name = "id") String id) throws HttpClientException {
+        return httpClientService.get(id);
     }
 
     @PostMapping(consumes = "application/json;charset=UTF-8", produces = MediaType.APPLICATION_JSON_VALUE)

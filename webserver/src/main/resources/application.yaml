@@ -16,10 +16,10 @@ be:
   pbin:
     write-server:
       base-url: ${WRITESERVER_URL}
-      path: "/api/save"
+      path: "/api/note"
     read-server:
       base-url: ${READSERVER_URL}
-      path: "/api/get"
+      path: "/api/note"
 
 server:
   error:

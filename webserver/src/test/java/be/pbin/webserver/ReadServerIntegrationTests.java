@@ -28,8 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ActiveProfiles("test")
 public class ReadServerIntegrationTests {
 
-    private static final String WEB_SERVER_GET_ENDPOINT = "/api/note";
-    private static final String SHORTLINK_REQ_PARAM = "?shortlink=";
+    private static final String WEB_SERVER_GET_ENDPOINT = "/api/note/";
 
     @Autowired
     private TestRestTemplate restTemplate;
@@ -61,10 +60,10 @@ public class ReadServerIntegrationTests {
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
 
         String expectedBody = """
-                {"type":"about:blank","title":"Not Found","status":404,"detail":"%s","instance":"/api/note"}"""
+                {"type":"about:blank","title":"Not Found","status":404,"detail":"%s","instance":"/api/note/"""
                 .formatted(messageSource.getMessage("memoshare.error.not.found", null, Locale.getDefault()));
 
-        assertEquals(expectedBody, response.getBody());
+        assertThat(response.getBody()).startsWith(expectedBody);
     }
 
     /**
@@ -80,10 +79,11 @@ public class ReadServerIntegrationTests {
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
 
         String expectedBody = """
-                                {"type":"about:blank","title":"Internal Server Error","status":500,"detail":"%s","instance":"/api/note"}"""
+                                {"type":"about:blank","title":"Internal Server Error","status":500,"detail":"%s","instance":"/api/note/"""
                                 .formatted(messageSource.getMessage("memoshare.error.internal.server", null, Locale.getDefault()));
 
-        assertEquals(expectedBody, response.getBody());
+        assertThat(response.getBody()).startsWith(expectedBody);
+
     }
 
     private ResponseEntity<String> executeGetRequestAndReturnStatusCode(int httpResponseCode, String responseBody) throws Exception {
@@ -103,15 +103,15 @@ public class ReadServerIntegrationTests {
         readServerBaseUrl.set(httpClientService, readServer.url("").toString());
 
         // request to webserver
-        String shortlink = RandomStringUtils.randomAlphanumeric(8);
-        ResponseEntity<String> response = restTemplate.getForEntity(WEB_SERVER_GET_ENDPOINT + SHORTLINK_REQ_PARAM + shortlink, String.class);
+        String memoId = RandomStringUtils.randomAlphanumeric(8);
+        ResponseEntity<String> response = restTemplate.getForEntity(WEB_SERVER_GET_ENDPOINT + memoId, String.class);
 
         // verify request to readserver
         RecordedRequest request = readServer.takeRequest();
         assertEquals("GET", request.getMethod());
         // double slash because MockWebServer adds slash to base url
-        assertEquals("//api/get/" + shortlink, request.getPath());
-        assertEquals(String.format("http://localhost:%s//api/get/%s", readServer.getPort(), shortlink), request.getRequestUrl().toString());
+        assertEquals("//api/note/" + memoId, request.getPath());
+        assertEquals(String.format("http://localhost:%s//api/note/%s", readServer.getPort(), memoId), request.getRequestUrl().toString());
 
         //
         assertThat(request.getHeader("Accept")).contains(MediaType.APPLICATION_JSON_VALUE);

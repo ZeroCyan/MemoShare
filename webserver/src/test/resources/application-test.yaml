@@ -24,7 +24,5 @@ be:
   pbin:
     write-server:
       base-url: "http://localhost:8003"
-      path: "/api/save"
     read-server:
       base-url: "http://localhost:8004"
-      path: "/api/get"
