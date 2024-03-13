@@ -14,7 +14,7 @@ spring:
 logging:
   level:
     root: ${ROOT_LOG_LEVEL}
-    be.pbin.readserver: ${APPLICATION_LOG_LEVEL}
+    be.pbin.webserver: ${APPLICATION_LOG_LEVEL}
 
 be:
   pbin:
